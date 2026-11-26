@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Turkey Escape</title>
+<meta name="description" content="Sneak the turkey out before Thanksgiving dinner. A tiny stealth game in your browser.">
+<meta property="og:title" content="Turkey Escape">
+<meta property="og:description" content="Sneak the turkey out before Thanksgiving dinner. Don't wake anyone.">
+<meta property="og:image" content="/og.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2a1f6b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🦃%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="fonts/TurkeyBubble-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Fredoka-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/LilitaOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="ds/tokens.css">
+<link rel="stylesheet" href="ds/bundle.css">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <!-- sheen: a thin light line hugging the top-left inner edge of each letter (the glyph minus itself nudged down-right, inset a little) -->
+  <filter id="te-sheen" primitiveUnits="objectBoundingBox" x="-10%" y="-10%" width="120%" height="120%">
+    <feMorphology in="SourceAlpha" operator="erode" radius="0.05 0.04" result="in"/>
+    <feOffset in="in" dx="0.022" dy="0.02" result="sh"/>
+    <feComposite in="in" in2="sh" operator="out" result="rim"/>
+    <feGaussianBlur in="rim" stdDeviation="0.004" result="soft"/>
+    <feFlood flood-color="#fffbe6" flood-opacity="0.85"/>
+    <feComposite in2="soft" operator="in"/>
+  </filter>
+</defs></svg>
+
+<canvas id="fill" width="64" height="36" aria-hidden="true"></canvas>
+<div id="frame">
+  <div id="stage" class="te-root">
+    <canvas id="view" width="1280" height="720"></canvas>
+    <div id="hud">
+      <div id="hud-lives"></div>
+      <div id="hud-clock"></div>
+      <div id="hud-noise"></div>
+      <div id="hud-prompt"></div>
+      <div id="hud-pop"></div>
+    </div>
+    <div id="screen"></div>
+    <button id="mute" aria-label="Sound on or off"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="w" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="x" d="M16 9l6 6M22 9l-6 6"/></svg></button>
+  </div>
+</div>
+<script src="ds/bundle.js"></script>
+<script src="js/kern.js"></script>
+<script src="js/letters.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

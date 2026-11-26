@@ -1,0 +1,817 @@
+html,body{margin:0;height:100%;background:var(--ink);overflow:hidden}
+#frame{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{position:relative;width:1280px;height:720px;flex:none;transform-origin:center center;overflow:hidden;background:var(--violet-600)}
+#view{position:absolute;inset:0;width:1280px;height:720px;display:block}
+
+/* ---------- HUD ---------- */
+#hud{position:absolute;inset:0;pointer-events:none;transition:opacity .3s}
+#hud.hidden{opacity:0}
+#hud-lives{position:absolute;left:30px;top:18px}
+#hud-noise{position:absolute;right:30px;top:16px}
+#hud-noise .te-meter{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
+#hud-noise .te-label{font-size:22px}
+#hud-clock{position:absolute;left:168px;top:30px}
+#hud-prompt{position:absolute;left:36px;bottom:30px}
+#hud-pop{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%)}
+.clock{--te-bg:var(--paper);--te-r:999px;--te-shadow-box:4px 5px 0 var(--ink);display:inline-flex;align-items:center;gap:10px;padding:8px 22px 8px 16px;color:var(--ink)}
+.clock b{font-family:var(--font-display);font-weight:400;font-size:38px;line-height:1;min-width:84px;text-align:left}
+.clock .clock-ic{display:inline-flex}
+.clock.hurry{--te-bg:var(--hot-pink);color:var(--paper);animation:pulse .5s ease-in-out infinite alternate}
+@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.08)}}
+.te-prompt.arrows{gap:10px}
+
+/* ---------- screens ---------- */
+#screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#screen.on{pointer-events:auto}
+#screen.dim{background:rgba(13,10,16,.45)}
+#screen.dim-lite{background:linear-gradient(180deg,rgba(13,10,16,.1),rgba(13,10,16,.35))}
+#screen.violet{background:var(--violet-500)}
+.col{display:flex;flex-direction:column;align-items:center;gap:20px}
+.row{display:flex;gap:28px;align-items:center;justify-content:center}
+.title-col{gap:14px;margin-top:10px}
+.tagline{font-size:44px;letter-spacing:.01em}
+.btns{margin-top:18px}
+.btns .te-btn{min-width:250px;height:80px;font-size:34px}
+.body{font-family:var(--font-text);font-weight:500;font-variation-settings:"wdth" 90;font-size:26px;color:var(--paper);text-align:center;max-width:760px;line-height:1.3;
+  -webkit-text-stroke:.15em var(--ink);paint-order:stroke fill}
+.timechip{--te-bg:var(--paper);--te-r:999px;--te-shadow-box:4px 5px 0 var(--ink);display:inline-flex;align-items:center;gap:10px;padding:8px 22px 8px 16px;color:var(--ink);
+  font-family:var(--font-text);font-weight:600;font-variation-settings:"wdth" 90;font-size:24px}
+.timeline{display:flex;align-items:center;gap:12px;color:var(--paper);font-family:var(--font-text);font-weight:600;font-variation-settings:"wdth" 90;font-size:30px;
+  -webkit-text-stroke:.14em var(--ink);paint-order:stroke fill}
+.timeline .clock-ic{filter:drop-shadow(0 0 0 var(--ink))}
+.timeline .dot{margin:0 6px}
+.how-in{padding:72px 50px 34px;display:flex;flex-direction:column;align-items:center;gap:22px}
+.cards{gap:26px}
+.how-rule{font-size:30px}
+.how-rule.small{font-size:22px;color:var(--mustard)}
+.hint{font-family:var(--font-text);font-weight:550;font-variation-settings:"wdth" 90;font-size:18px;color:var(--paper);opacity:.8;text-transform:uppercase;letter-spacing:.04em;
+  -webkit-text-stroke:.14em var(--ink);paint-order:stroke fill}
+.clearwrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.floaters{position:absolute;inset:0;pointer-events:none}
+.floater{position:absolute;transform:rotate(var(--r));animation:drift 3.2s ease-in-out infinite alternate;filter:drop-shadow(3px 4px 0 rgba(13,10,16,.5))}
+@keyframes drift{from{transform:rotate(var(--r)) translateY(0)}to{transform:rotate(calc(var(--r) + 8deg)) translateY(-14px)}}
+.pop-in{animation:popin .34s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes popin{from{transform:scale(.3) rotate(-8deg);opacity:0}to{transform:scale(1);opacity:1}}
+.bob{animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* ---------- v3: fewer words, floating cards ---------- */
+.te-prompt b{font-family:var(--font-display);font-weight:400;font-size:30px;letter-spacing:.02em}
+.te-prompt .count{font-family:var(--font-text);font-weight:600;font-variation-settings:"wdth" 90;font-size:22px;color:var(--violet-500)}
+.float-card{--te-r:34px;position:relative;display:flex;flex-direction:column;align-items:center;gap:18px;padding:40px 70px 38px;
+  background:var(--violet-500);border:5px solid var(--ink);border-radius:34px;box-shadow:10px 12px 0 var(--ink);animation:popin .34s cubic-bezier(.2,1.6,.4,1) both, floaty 3.4s ease-in-out .4s infinite}
+@keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -8px}}
+.float-card .sub{font-size:40px}
+.float-card .te-btn{min-width:240px;height:78px;font-size:36px}
+.chips{display:flex;gap:14px}
+.chip-s{--te-bg:var(--paper);--te-r:999px;--te-shadow-box:4px 5px 0 var(--ink);display:inline-flex;align-items:center;gap:8px;padding:6px 18px 6px 12px;color:var(--ink)}
+.chip-s b{font-family:var(--font-display);font-weight:400;font-size:32px}
+.clear-card{padding:34px 90px 36px;gap:10px}
+.clear-card .smug{width:240px;height:auto;margin-top:4px;animation:popin .4s cubic-bezier(.2,1.6,.4,1) .15s both}
+.stars{display:flex;gap:22px;margin:4px 0 14px}
+.star{width:92px;height:auto;animation:popin .38s cubic-bezier(.2,1.8,.4,1) both}
+.caught{gap:26px}
+.caught .line{font-size:36px}
+#screen.dim{background:rgba(13,10,16,.38);backdrop-filter:blur(2px)}
+#mute{position:absolute;right:36px;bottom:30px;width:76px;height:76px;box-sizing:border-box;border-radius:50%;border:4px solid var(--ink);background:var(--paper);color:var(--ink);
+  box-shadow:4px 5px 0 var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;padding:0}
+#mute .x{display:none} #mute.off .x{display:inline} #mute.off .w{display:none}
+#mute svg{width:34px;height:34px} /* sound button mirrors the bottom-left prompt pill: same 30px bottom / 36px side margin, same 76px height and fully round ends */
+
+/* ---------- type scale (one hierarchy for every panel) ----------
+   hero 132 logo · h1 96 panel titles (Lettering, set in JS)
+   h2 40 subtitles · h3 32 buttons + card labels · body 26 one-line messages · hud 28 */
+:root{--t-h2:40px;--t-h3:32px;--t-body:26px;--t-hud:28px}
+.tagline,.float-card .sub,.caught .line{font-size:var(--t-h2)}
+.te-btn,.btns .te-btn,.float-card .te-btn{font-size:var(--t-h3);height:72px;min-width:220px}
+.te-btn .te-btn-label{font-size:var(--t-h3)}
+.te-card .te-card-label{font-size:var(--t-h3)}
+.te-prompt b{font-size:var(--t-hud)}
+.chip-s b,.clock b{font-size:34px}
+.caught .line{font-size:var(--t-body);letter-spacing:.02em}
+/* how to play */
+.how-in{padding:18px 30px 6px;gap:28px}
+.cards{gap:22px}
+.rule{font-family:var(--font-text);font-weight:600;font-variation-settings:"wdth" 90;font-size:var(--t-body);color:var(--ink);text-transform:uppercase;
+  background:var(--mustard);border:4px solid var(--ink);border-radius:999px;padding:8px 26px;box-shadow:4px 5px 0 var(--ink);letter-spacing:.02em}
+/* title: the house at night */
+.title-layout{position:absolute;inset:0}
+.title-top{position:absolute;left:0;right:0;top:56px;gap:6px}
+.title-btns{position:absolute;left:0;right:0;bottom:56px;gap:28px}
+.title-btns .te-btn{min-width:250px;height:80px}
+.title-turkey{position:absolute;left:70px;bottom:-34px;width:270px;transform-origin:50% 100%;animation:peek 2.6s ease-in-out infinite;filter:drop-shadow(6px 8px 0 rgba(13,10,16,.45))}
+@keyframes peek{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-6px)}}
+.title-btns{bottom:40px}
+.title-top{top:40px}
+.clock-art{width:118px;height:auto}
+.title-btns{left:auto;right:70px;bottom:70px;flex-direction:column;gap:18px;align-items:stretch}
+.title-btns .te-btn{min-width:270px}
+/* title v3: Fish-Market composition — logo + tagline + buttons stacked above the empty plate */
+.title-top{top:34px}
+.title-btns{left:0;right:0;bottom:auto;top:258px;flex-direction:row;gap:26px;align-items:center}
+.title-btns .te-btn{min-width:230px;height:72px}
+.title-top{top:40px}
+.title-btns{top:226px}
+/* title v4: everything centered, Bernard-style — logo + tagline + buttons as one lockup in the middle of the feast ring */
+.title-layout{display:flex;align-items:center;justify-content:center}
+.title-top{position:relative;top:auto;left:auto;right:auto;gap:4px}
+.title-btns{position:relative;top:auto;left:auto;right:auto;bottom:auto;margin-top:6px}
+.title-stack{display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:-30px}
+/* title v5: logo lockup sits on the empty platter */
+.title-stack{margin-top:0;gap:22px;transform:translateY(-6px)}
+.title-top{gap:0}
+.title-top .te-letters + .te-letters{margin-top:-18px}
+.tagline.small{font-size:26px;letter-spacing:.06em;margin-bottom:2px}
+.title-btns{margin-top:0}
+.title-btns .te-btn{min-width:220px;height:70px}
+/* title v6: bigger lockup */
+.title-stack{gap:26px;transform:translateY(4px)}
+.title-top .te-letters + .te-letters{margin-top:-28px}
+.tagline.small{font-size:30px}
+.title-btns{gap:30px}
+.title-btns .te-btn{min-width:260px;height:84px}
+.title-btns .te-btn .te-btn-label{font-size:38px}
+/* side-view title mockups: big logo in the empty wall, buttons resting on the platter */
+.title-layout.side{display:block}
+.title-layout.side .title-stack{position:absolute;inset:0;transform:none;margin:0;display:block}
+.title-layout.side .title-top{position:absolute;left:0;right:0;top:34px}
+.title-layout.side .title-btns{position:absolute;left:0;right:0;top:var(--btn-y,470px)}
+.title-layout.side{--btn-y:452px}
+/* title v8: one lockup centred in the frame, vertically too */
+.title-layout.side{display:flex;align-items:center;justify-content:center}
+.title-layout.side .title-stack{position:relative;inset:auto;display:flex;flex-direction:column;align-items:center;gap:30px;transform:translateY(10px)}
+.title-layout.side .title-top,.title-layout.side .title-btns{position:relative;top:auto;left:auto;right:auto}
+/* title v9: lockup dead-centre over the big empty platter */
+.title-layout.side .title-stack{transform:none;gap:26px}
+/* title v10 */
+.title-layout.side .title-stack{gap:30px}
+.title-top .te-letters + .te-letters{margin-top:-14px}
+/* Turkey Bubble: our own display face, traced from the Luma lettering */
+@font-face{font-family:"Turkey Bubble";src:url("../fonts/TurkeyBubble-Regular.woff2") format("woff2");font-display:block}
+:root{--font-display:"Turkey Bubble","Lilita One",system-ui,sans-serif}
+/* wider pink extrusion + kerning on for the display face */
+.te-letters{font-kerning:none;font-feature-settings:"kern" 0}
+
+/* title lettering: deep pink extrusion down-right, like the mockup */
+.te-letters .te-ch::before{left:.035em !important;top:.13em !important}
+/* all buttons (title look): colour fill, ink outline, white rim, hard ink drop */
+.te-btn > .te-btn-bg{display:none}
+.te-btn{background:var(--mustard);border:5px solid var(--ink);border-radius:16px;padding:0 34px 2px;
+  box-shadow:0 0 0 7px #fff,6px 9px 0 7px var(--ink);min-width:230px;height:76px}
+.te-btn.teal{background:var(--teal)}
+.te-btn .te-btn-label{font-size:40px;font-weight:700;letter-spacing:.01em}
+.title-btns{gap:44px}
+/* title: logo artwork, lifted so the buttons clear the platter */
+.title-logo{display:block;width:640px;height:auto;filter:drop-shadow(0 6px 0 rgba(13,10,16,.25))}
+.title-layout.side{padding-bottom:150px;box-sizing:border-box}
+.title-layout.side .title-stack{gap:22px}
+/* lettering style for every title (Tina's logo): thin ink outline, warm yellow fill, sheen line, pink extrusion down-right */
+.te-letters:not(.is-plain) .te-ch{--stroke-letter:.075em}
+.te-letters:not(.is-plain) .te-ch::after{content:attr(data-c);position:absolute;left:0;top:0;pointer-events:none;
+  color:transparent;-webkit-text-stroke:0;
+  background:linear-gradient(180deg,#fbcb45 0%,#f7c036 55%,#f1b02a 100%);
+  -webkit-background-clip:text;background-clip:text}
+.te-letters .te-ch .te-hl{position:absolute;left:0;top:0;z-index:2;pointer-events:none;color:#fff;-webkit-text-stroke:0;filter:url(#te-sheen);-webkit-mask-image:linear-gradient(170deg,#000 0%,#000 30%,transparent 52%);mask-image:linear-gradient(170deg,#000 0%,#000 30%,transparent 52%)}
+.te-letters.is-plain .te-hl{display:none}
+:root{--letter-shadow-x:.06em;--letter-shadow-y:.14em} /* design system tokens letter-shadow-x / -y */
+.te-letters:not(.is-plain) .te-ch::before{left:var(--letter-shadow-x) !important;top:var(--letter-shadow-y) !important;color:#e8317a}
+.title-top.glossy{padding-bottom:.2em}
+/* letters drawn from Tina's styled SVG letter set */
+.te-letters.svgl .te-word.svgl-word{display:inline-flex;align-items:flex-start}
+.te-letters.svgl .svgl-word .te-ch{color:transparent;-webkit-text-stroke:0;height:1em;margin-left:0}
+.te-letters.svgl .svgl-word .te-ch::before,.te-letters.svgl .svgl-word .te-ch::after{display:none !important}
+.te-letters.svgl .svgl-word .te-ch img{position:absolute;max-width:none;pointer-events:none;user-select:none}
+.float-card .te-btn,.btns .te-btn{height:68px;min-width:200px}
+.float-card .te-btn .te-btn-label,.btns .te-btn .te-btn-label{font-size:32px}
+.title-btns .te-btn{height:76px;min-width:230px}
+.title-btns .te-btn .te-btn-label{font-size:40px}
+/* the title font for all UI text too (labels, buttons, prompts); symbols it lacks fall back to Fredoka */
+:root{--font-text:"Turkey Bubble","Fredoka",system-ui,sans-serif}
+.te-btn,.te-btn .te-btn-label,.te-label,.te-prompt,.te-prompt b,.te-card-label,.te-sticker,.te-sticker b,.chip-s b,.clock b{font-family:var(--font-text) !important;font-weight:400 !important;font-synthesis:none;font-variation-settings:normal}
+.te-card-label{font-size:24px !important;white-space:nowrap}
+.te-3d.te-letters .te-ch::before{display:none !important}
+/* ---------- title card motion ---------- */
+@property --bob{syntax:"<length>";inherits:false;initial-value:0em}
+@property --drop{syntax:"<length>";inherits:false;initial-value:0em}
+@property --sq{syntax:"<number>";inherits:false;initial-value:1}
+.title-top .te-ch{transform:translateY(calc(var(--dy,0em) + var(--bob) + var(--drop))) rotate(var(--rot,0deg)) scale(var(--sc,1)) scaleY(var(--sq));
+  animation:te-drop .7s cubic-bezier(.3,1.5,.5,1) both, te-bob 2.6s ease-in-out infinite;
+  animation-delay:calc(var(--i,0) * 55ms), calc(var(--i,0) * -0.16s + .9s)}
+@keyframes te-drop{0%{--drop:-3em;--sq:1.15;opacity:0}55%{--drop:.06em;--sq:.82;opacity:1}75%{--drop:-.04em;--sq:1.06}100%{--drop:0em;--sq:1;opacity:1}}
+@keyframes te-bob{0%,100%{--bob:0em}50%{--bob:-.05em}}
+.title-btns .te-btn{animation:te-btn-in .5s cubic-bezier(.3,1.6,.5,1) both;animation-delay:.75s}
+.title-btns .te-btn + .te-btn{animation-delay:.85s}
+.title-btns .te-btn:first-child{animation:te-btn-in .5s cubic-bezier(.3,1.6,.5,1) .75s both, te-nudge 3.2s ease-in-out 2s infinite}
+@keyframes te-btn-in{0%{transform:rotate(var(--tilt,-2deg)) scale(.3);opacity:0}100%{transform:rotate(var(--tilt,-2deg)) scale(1);opacity:1}}
+@keyframes te-nudge{0%,80%,100%{transform:rotate(var(--tilt,-2deg)) scale(1)}86%{transform:rotate(calc(var(--tilt,-2deg) + 4deg)) scale(1.06)}92%{transform:rotate(calc(var(--tilt,-2deg) - 3deg)) scale(1.04)}}
+@media (prefers-reduced-motion:reduce){.title-top .te-ch,.title-btns .te-btn{animation:none}}
+/* unified panels (How to Play look) */
+.panel-in{display:flex;flex-direction:column;align-items:center;gap:24px;padding:76px 70px 38px;min-width:460px}
+.panel-in.how-in{padding:76px 40px 34px;gap:28px}
+.panel-in .sub{font-size:var(--t-h2)}
+.panel-in.clear-in{padding:70px 80px 36px;gap:12px}
+.panel-in.clear-in .smug{width:230px;height:auto;animation:popin .4s cubic-bezier(.2,1.6,.4,1) .15s both}
+/* panel layout v2: title on the top edge, buttons on the bottom edge */
+.panel-wrap{align-items:center}
+.panel-btns{position:relative;z-index:3;gap:34px;justify-content:center;margin-top:-44px}
+.panel-in{padding:84px 80px 76px;gap:22px}
+.panel-in.how-in{padding:96px 56px 84px}
+.panel-in.how-in .cards{gap:30px}
+.panel-in.chapter-in{padding:78px 110px 76px;gap:14px}
+.panel-parrot{width:150px;height:auto;margin-bottom:2px;animation:te-snooze 2.8s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes te-snooze{0%,100%{transform:rotate(-2deg) scaleY(1)}50%{transform:rotate(2deg) scaleY(.97)}}
+.panel-in .sub{font-size:34px;letter-spacing:.02em}
+.panel-in.pause-in{padding:96px 110px 80px}
+.pause-stats{gap:40px;align-items:center}
+.panel-in.clear-in{padding:80px 110px 80px;gap:10px}
+.panel-in.soon-in{padding:96px 120px 84px}
+.chip-s b,.clock b{font-size:28px;letter-spacing:.02em}
+.panel-in.how-in{padding:92px 44px 80px}
+.panel-in.how-in .cards{gap:26px}
+.panel-in.chapter-in{padding:70px 120px 74px;gap:12px}
+.panel-parrot{width:210px}
+.panel-in .sub{font-size:40px}
+.panel-in.pause-in{padding:84px 120px 76px}
+
+.panel-in.how-in{padding:88px 50px 78px}
+.panel-in.chapter-in{padding:64px 120px 70px;gap:10px}
+.panel-parrot{width:160px}
+.pause-stats{transform:scale(1.35)}
+/* ---------- v3 polish ---------- */
+/* every story panel is the same size; contents centred */
+.panel-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.soon-in{box-sizing:border-box;width:820px;height:440px;padding:72px 60px 64px;justify-content:center;gap:16px}
+.panel-in.how-in{box-sizing:border-box;width:1120px;height:440px;padding:72px 44px 64px;justify-content:center}
+.panel-in.clear-in .smug{width:170px}
+.panel-in.clear-in .star{width:74px;height:auto}
+.panel-parrot{width:150px}
+/* pause: two labelled stat cards */
+.pause-stats{gap:28px;align-items:stretch;transform:none}
+.stat{--te-bg:var(--violet-400);--te-r:22px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px;width:230px;height:170px;padding:16px 14px 12px;box-sizing:border-box;
+  background:var(--violet-400);border:3.5px solid var(--ink);border-radius:22px;box-shadow:6px 7px 0 var(--ink)}
+.stat-art{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;color:#fff}
+.stat-art.big-time b{font-family:var(--font-text);font-size:58px;line-height:1;color:#fff;-webkit-text-stroke:.1em var(--ink);paint-order:stroke fill}
+.stat-art.big-time .clock-ic{color:#fff;filter:drop-shadow(2px 2px 0 var(--ink))}
+.stat-label{font-family:var(--font-text);font-weight:400;font-size:24px;color:var(--ink);letter-spacing:.02em}
+.panel-in .hint{font-size:24px;opacity:.9}
+/* timer: bigger, and the pill hugs its numbers */
+.clock{padding:8px 20px 8px 14px;gap:10px}
+.clock b,.chip-s b{min-width:0 !important;font-size:40px !important;letter-spacing:.01em}
+.clock .clock-ic svg{width:36px;height:36px}
+.chip-s{display:inline-flex;align-items:center;gap:10px;padding:8px 22px 8px 16px;width:auto}
+.chip-s .clock-ic svg{width:34px;height:34px}
+#hud-clock{top:26px}
+/* title motion: calmer */
+.title-top .te-ch{animation:te-drop .9s cubic-bezier(.22,1,.36,1) both, te-bob 4.2s ease-in-out infinite;animation-delay:calc(var(--i,0) * 45ms), calc(var(--i,0) * -0.3s + 1.2s)}
+@keyframes te-drop{0%{--drop:-.6em;opacity:0}100%{--drop:0em;opacity:1}}
+@keyframes te-bob{0%,100%{--bob:0em}50%{--bob:-.022em}}
+.title-btns .te-btn:first-child{animation:te-btn-in .6s cubic-bezier(.22,1,.36,1) .7s both, te-nudge 5s ease-in-out 3s infinite}
+@keyframes te-btn-in{0%{transform:rotate(var(--tilt,-2deg)) translateY(14px);opacity:0}100%{transform:rotate(var(--tilt,-2deg)) translateY(0);opacity:1}}
+@keyframes te-nudge{0%,88%,100%{transform:rotate(var(--tilt,-2deg))}92%{transform:rotate(calc(var(--tilt,-2deg) + 1.5deg))}96%{transform:rotate(calc(var(--tilt,-2deg) - 1deg))}}
+.stat{width:240px;height:170px;flex:0 0 auto}
+.panel-in.pause-in{gap:22px}
+.panel-in.pause-in .hint{margin-top:2px}
+.panel-parrot{width:180px}
+.panel-in .pause-stats{display:flex;flex-direction:row;gap:32px !important;align-items:stretch}
+.pause-stats .stat{width:250px !important;height:180px !important;padding:14px 14px 14px;overflow:hidden}
+.pause-stats .stat-art{height:110px;flex:0 0 110px}
+.pause-stats .stat-art > *{max-height:110px}
+.pause-stats .stat-art .te-lives,.pause-stats .stat-art > div{transform:scale(.95)}
+/* ---------- v4 ---------- */
+/* title: the logo moves as one piece — eases in, then floats slowly. No per-letter motion. */
+.title-top .te-ch{animation:none !important;transform:translateY(var(--dy,0)) rotate(var(--rot,0deg)) scale(var(--sc,1)) !important}
+.title-top{animation:te-logo-in .9s cubic-bezier(.22,1,.36,1) both, te-logo-float 6s ease-in-out 1s infinite;will-change:transform}
+@keyframes te-logo-in{0%{opacity:0;transform:translateY(-18px) scale(.97)}100%{opacity:1;transform:none}}
+@keyframes te-logo-float{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-6px) rotate(-.4deg)}}
+@media (prefers-reduced-motion:reduce){.title-top{animation:none}}
+/* panels: one style everywhere — cards are the How to Play card */
+.panel-in.how-in{width:1160px}
+.panel-in .cards{gap:26px}
+.pause-stats.cards{gap:34px !important}
+.big-time{display:flex;align-items:center;gap:10px;color:#fff}
+.big-time b{font-family:var(--font-text);font-size:66px;line-height:1;color:#fff;-webkit-text-stroke:.09em var(--ink);paint-order:stroke fill}
+.big-time .clock-ic{color:#fff;filter:drop-shadow(2px 3px 0 var(--ink))}
+/* HUD: feathers and timer share one centre line */
+#hud-lives{top:14px}
+#hud-clock{top:0;height:0;display:flex;align-items:center;transform:translateY(var(--hud-mid,68px))}
+/* ---------- v5 ---------- */
+.panel-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.soon-in{width:720px;height:400px;padding:66px 50px 60px}
+.panel-in.how-in{width:1100px;height:400px;padding:66px 40px 60px}
+.panel-in .cards{gap:22px}
+.panel-in .sub{font-size:30px !important;letter-spacing:.02em}
+.panel-parrot{width:150px}
+.panel-in.clear-in .smug{width:190px;height:auto}
+.panel-in.clear-in .star{width:64px}
+.te-prompt b{font-size:26px}
+.te-prompt .arrow-ic{display:inline-flex;margin:0 -2px;filter:drop-shadow(1px 2px 0 #0d0a10)}
+.te-prompt .dot{width:7px;height:7px;border-radius:50%;background:var(--ink);margin:0 6px}
+.te-prompt{gap:8px;padding:10px 22px}
+.panel-in.clear-in .smug.win{width:auto;height:170px;animation:te-hop 1.1s cubic-bezier(.3,0,.4,1) .2s infinite}
+@keyframes te-hop{0%,100%{transform:translateY(0) rotate(-3deg)}45%{transform:translateY(-14px) rotate(3deg)}}
+/* ---------- v6 ---------- */
+.panel-in.how-in{width:1230px;height:440px;padding:70px 30px 64px}
+.panel-in .cards{gap:20px}
+.panel-in.pause-in{height:420px}
+.panel-in,.panel-in.chapter-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{height:420px}
+.panel-parrot{width:190px}
+.caught-parrot{animation:te-shake .25s linear infinite}
+@keyframes te-shake{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.panel-in.clear-in .smug.win{height:230px}
+.panel-in.clear-in .star{width:58px}
+.panel-in.clear-in{gap:6px}
+.te-prompt .arrow-ic{filter:none;margin:0 -4px}
+.panel-in.how-in{width:1180px}
+/* ---------- v7 ---------- */
+.title-layout.side .title-stack{gap:56px !important}
+.title-btns .te-btn:first-child{animation:te-btn-in .6s cubic-bezier(.22,1,.36,1) .7s both, te-wave 3.4s ease-in-out 2.2s infinite !important}
+@keyframes te-wave{0%,70%,100%{transform:rotate(var(--tilt,-2deg)) scale(1)}
+  74%{transform:rotate(calc(var(--tilt,-2deg) - 6deg)) scale(1.07)}78%{transform:rotate(calc(var(--tilt,-2deg) + 5deg)) scale(1.07)}
+  82%{transform:rotate(calc(var(--tilt,-2deg) - 4deg)) scale(1.05)}86%{transform:rotate(calc(var(--tilt,-2deg) + 2deg)) scale(1.02)}90%{transform:rotate(var(--tilt,-2deg)) scale(1)}}
+.title-btns .te-btn:first-child:hover{animation-play-state:paused}
+.pause-stats .te-card-art{display:flex;align-items:center;justify-content:center}
+.pause-stats .te-card-art > *{margin:0 auto}
+.panel-custom{display:flex;flex-direction:column;align-items:center}
+.panel-head{position:relative;z-index:2;margin-bottom:-92px}
+.stars3d{display:flex;align-items:flex-end;gap:4px}
+.stars3d .star3d:nth-child(1){transform:rotate(-12deg) translateY(6px)}
+.stars3d .star3d:nth-child(3){transform:rotate(12deg) translateY(6px)}
+.star3d{display:inline-flex;animation:te-star-in .5s cubic-bezier(.3,1.6,.5,1) both}
+.star3d svg{overflow:visible}
+@keyframes te-star-in{0%{opacity:0;scale:.2}100%{opacity:1;scale:1}}
+.panel-in.clear-in{padding-top:90px}
+.panel-in.clear-in .smug.win{height:250px}
+.pause-stats .te-card-art{transform:translateY(-10px)}
+.pause-stats .te-card:first-child .te-card-art{transform:translateY(-6px)}
+/* How to Play: panel back to its earlier size; the cards fill it instead */
+.panel-in.how-in{width:1060px !important;height:auto !important;padding:62px 22px 54px !important}
+.panel-in.how-in .cards{gap:0 !important;margin:0 -12px}
+/* ---------- v8 ---------- */
+.how-in .te-card-art{transform:scale(1.22)}
+.how-in .te-card:nth-child(1) .te-card-art{transform:scale(1.22) rotate(-6deg)}
+.how-in .te-card:nth-child(2) .te-card-art{transform:scale(1.22) rotate(4deg)}
+.how-in .te-card:nth-child(3) .te-card-art{transform:scale(1.22) rotate(-3deg)}
+.how-in .te-card:nth-child(4) .te-card-art{transform:scale(1.22) rotate(7deg)}
+.big-time b{-webkit-text-stroke:.045em var(--ink) !important;font-size:60px !important}
+.big-time .clock-ic svg{stroke-width:2.4}
+.pause-stats .te-card:first-child .te-card-art{transform:translateY(-20px) !important}
+.te-prompt .te-key{flex:0 0 auto}
+.te-prompt .te-key-label{display:flex;align-items:center;justify-content:center}
+.te-prompt .arrow-ic.in-key{margin:0}
+.te-prompt .arrow-ic.in-key svg{width:24px;height:24px}
+/* How to Play: bigger boxes, art back to its normal size */
+.how-in .te-card .te-card-bg{transform:scale(1.06,1.12)}
+.how-in .te-card:nth-child(n) .te-card-art{transform:none}
+.how-in .te-card:nth-child(1) .te-card-art{transform:rotate(-6deg)}
+.how-in .te-card:nth-child(2) .te-card-art{transform:rotate(4deg)}
+.how-in .te-card:nth-child(3) .te-card-art{transform:rotate(-3deg)}
+.how-in .te-card:nth-child(4) .te-card-art{transform:rotate(7deg)}
+.how-in .te-card-label{position:relative;top:6px}
+/* every panel: same head height, same box height */
+.panel-head{height:96px !important;margin-bottom:-48px !important;display:flex;align-items:center;justify-content:center;overflow:visible}
+.panel-in.how-in{height:420px !important;box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:62px 22px 54px !important}
+.panel-custom{gap:0 !important}
+/* ---------- v9 ---------- */
+.how-in .te-card:nth-child(n) .te-card-art{transform:none !important}
+.how-in .te-card:nth-child(1){transform:rotate(-3deg)}
+.how-in .te-card:nth-child(2){transform:rotate(2deg) translateY(6px)}
+.how-in .te-card:nth-child(3){transform:rotate(-1.5deg)}
+.how-in .te-card:nth-child(4){transform:rotate(3deg) translateY(4px)}
+.big-time b{-webkit-text-stroke:.085em var(--ink) !important}
+.panel-in.chapter-in{gap:14px}
+.goal{gap:14px;align-items:center}
+.rules{gap:16px}
+.rule{display:inline-flex;align-items:center;gap:10px;padding:6px 18px 6px 10px;--te-bg:var(--violet-400);background:var(--violet-400);border:3px solid var(--ink);border-radius:999px;box-shadow:4px 5px 0 var(--ink)}
+.rule b{font-family:var(--font-text);font-weight:400;font-size:22px;color:#fff;-webkit-text-stroke:.12em var(--ink);paint-order:stroke fill}
+.rule-ic{height:34px;width:auto}
+.rule-z{font-family:var(--font-text);font-size:24px;color:#fff;-webkit-text-stroke:.12em var(--ink);paint-order:stroke fill;width:34px;text-align:center}
+.panel-in.chapter-in .panel-parrot{width:160px}
+.rule b{font-size:27px}
+.rule{padding:8px 22px 8px 12px}
+.rule-ic{height:44px}
+.rule-z{font-size:30px;width:44px}
+.goal .sub{font-size:34px !important}
+.pause-stats .te-card:nth-child(1){transform:rotate(-3deg)}
+.pause-stats .te-card:nth-child(2){transform:rotate(2.5deg) translateY(4px)}
+/* ---------- v10 ---------- */
+.panel-in.how-in .cards{gap:14px !important;margin:0 !important}
+.how-in .te-card .te-card-bg{transform:scale(1.02,1.1) !important}
+.rules{gap:18px}
+.chip-s{height:56px;box-sizing:border-box}
+.chip-ic{height:34px;width:auto;margin-right:2px}
+.chip-z{font-family:var(--font-text);font-size:26px;color:var(--ink);width:34px;text-align:center;letter-spacing:-.02em}
+.panel-in.chapter-in{gap:16px}
+/* ---------- v11 ---------- */
+.panel-in.how-in{padding-left:14px !important;padding-right:14px !important}
+.panel-in.how-in .cards{gap:10px !important}
+.how-in .te-card .te-card-bg{transform:scale(1,1.12) !important}
+.how-in .te-card:nth-child(1){transform:rotate(-1.6deg)}
+.how-in .te-card:nth-child(2){transform:rotate(1.4deg) translateY(5px)}
+.how-in .te-card:nth-child(3){transform:rotate(-1deg)}
+.how-in .te-card:nth-child(4){transform:rotate(1.8deg) translateY(3px)}
+.panel-in.chapter-in{gap:6px;padding-top:58px}
+.panel-in.chapter-in .panel-parrot{width:140px}
+.goals{gap:44px;align-items:flex-end}
+.goal-i{display:flex;flex-direction:column;align-items:center;gap:8px;width:190px}
+.goal-art{height:74px;width:auto;object-fit:contain}
+.goal-i .te-meter,.goal-i > :first-child:not(img){height:74px;display:flex;align-items:center}
+.goal-i .te-label{font-size:24px;white-space:nowrap}
+.goal-art{height:92px}
+.goal-i .te-meter,.goal-i > :first-child:not(img){height:92px}
+.goal-i .te-meter svg,.goal-i .te-meter img{width:150px}
+.goal-i .te-label{font-size:30px}
+.goal-i{width:auto}
+.goals{gap:54px}
+.panel-in.chapter-in .panel-parrot{width:130px}
+.panel-in.chapter-in{gap:22px !important;padding-top:50px}.panel-in.chapter-in .panel-parrot{width:118px}
+/* ---------- v12 ---------- */
+.how-in .te-card{height:268px}
+.how-in .te-card .te-card-bg{transform:none !important}
+.how-in .te-card .te-card-bg svg{height:100%}
+.panel-head{margin-bottom:-44px !important}
+.stars3d{gap:0}
+.panel-in.chapter-in .panel-parrot{width:190px !important}
+.panel-in.chapter-in{gap:10px !important;padding-top:44px}
+.goals{gap:40px}
+.goal-art{height:58px}
+.goal-i .te-meter,.goal-i > :first-child:not(img){height:58px}
+.goal-i .te-meter svg,.goal-i .te-meter img{width:110px}
+.goal-i .te-label{font-size:22px}
+.goal-i{gap:4px}
+.goal-art,.goal-i .te-meter,.goal-i > :first-child:not(img){height:66px}.goal-i .te-label{font-size:25px}.goals{gap:48px}
+/* ---------- v13 ---------- */
+.how-in .te-card .te-card-art{transform:scale(1.1) !important}
+.goals.cards{gap:16px !important}
+.goals .te-card:nth-child(1){transform:rotate(-2deg)}
+.goals .te-card:nth-child(2){transform:rotate(1.5deg) translateY(4px)}
+.goals .te-card:nth-child(3){transform:rotate(-1deg)}
+.goals .te-card-label{font-size:19px !important}
+.goals .goal-art{height:64px !important;width:auto}
+.panel-in.chapter-in{gap:8px !important;padding-top:40px !important}
+.panel-in.chapter-in .panel-parrot{width:150px !important}
+.panel-in.clear-in .smug.win{height:210px}
+.panel-in.clear-in{gap:12px !important}
+/* ---------- tiles (direction C, subtle) ---------- */
+.tiles{display:flex;gap:18px;justify-content:center;align-items:stretch}
+.tile{width:236px;height:236px;box-sizing:border-box;padding:18px 10px 16px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  background:rgba(22,10,72,.18);border-radius:24px;box-shadow:inset 0 3px 0 rgba(15,5,50,.16)}
+.tile.sm{width:196px;height:168px;padding:14px 8px 12px}
+.tile-art{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.tile-img{max-height:112px;width:auto}
+.tile.sm .tile-img{max-height:70px}
+.tile.sm .te-meter{transform:scale(.9)}
+.tile-lbl{font-family:var(--font-text);font-size:22px;line-height:1;color:#fff;-webkit-text-stroke:.14em var(--ink);paint-order:stroke fill;white-space:nowrap;letter-spacing:.02em}
+.panel-in.how-in{padding:70px 24px 60px !important}
+.panel-in.chapter-in{gap:12px !important;padding-top:52px !important}
+.panel-in.chapter-in .panel-parrot{width:120px !important}
+.panel-in.pause-in{padding-top:66px}
+.tile .big-time b{font-size:56px !important}
+/* ---------- tiles: direction D, paper cards ---------- */
+.tiles{gap:22px;align-items:center}
+.tile{width:240px;height:258px;padding:18px 12px 18px;background:#fff6e4;border:3.5px solid var(--ink);border-radius:20px;box-shadow:none}
+.tiles .tile:nth-child(odd){transform:rotate(-2.5deg)}
+.tiles .tile:nth-child(even){transform:rotate(2deg) translateY(6px)}
+.tile-lbl{color:var(--ink);-webkit-text-stroke:0;font-size:25px}
+.tile-img{max-height:130px}
+.tile.art-only{width:210px;height:210px;justify-content:center}
+.tile.art-only.hero{width:250px;height:250px}
+.tile.art-only .tile-img{max-height:120px;max-width:170px}
+.tile.art-only.hero .tile-img{max-height:190px}
+.big-time.ink{color:var(--ink)}
+.big-time.ink b{color:var(--ink);-webkit-text-stroke:0 !important;font-size:52px !important}
+.big-time.ink .clock-ic{color:var(--ink);filter:none}
+.tile .big-time:not(.ink) b{color:var(--ink);-webkit-text-stroke:0 !important}
+.tile .big-time:not(.ink) .clock-ic{color:var(--ink);filter:none}
+.panel-in.how-in{padding:62px 20px 54px !important}
+.panel-in.chapter-in{padding:60px 30px 56px !important}
+.panel-in.chapter-in .tiles{gap:26px}
+.panel-in,.panel-in.how-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{height:440px !important}
+/* ---------- tiles: no boxes — big art + white outlined label ---------- */
+.tiles .tile,.tiles .tile:nth-child(n){background:none !important;border:0 !important;box-shadow:none !important;transform:none !important;width:240px;height:250px;padding:0;justify-content:center;gap:18px}
+.tile-art{flex:0 0 150px}
+.tile-img{max-height:140px !important;max-width:200px}
+.tile-lbl{color:#fff !important;-webkit-text-stroke:.14em var(--ink) !important;paint-order:stroke fill;font-size:30px !important}
+.tile .big-time:not(.ink) b{color:#fff !important;-webkit-text-stroke:.085em var(--ink) !important}
+.tile .big-time:not(.ink) .clock-ic{color:#fff;filter:drop-shadow(2px 3px 0 var(--ink))}
+.tiles{gap:20px}
+.panel-in.chapter-in .tiles{gap:14px}
+.panel-in.chapter-in .tile{width:220px}
+/* Chapter 1: the sleeping parrot is the panel's head */
+.panel-head:has(.head-parrot){height:170px !important;margin-bottom:-70px !important}
+.head-parrot{height:180px;width:auto;animation:te-snooze 2.8s ease-in-out infinite;transform-origin:50% 90%}
+.panel-in.chapter-in{padding:90px 20px 56px !important}
+.panel-head:has(.head-parrot){height:150px !important;margin-bottom:-102px !important}
+.head-parrot{height:150px}
+.panel-in.chapter-in{padding:96px 10px 56px !important}
+.panel-in.chapter-in .tiles{gap:26px}
+.panel-in.chapter-in .tile{width:200px}
+.panel-in.chapter-in .tile-lbl{font-size:25px !important}
+/* ================= unified panel system =================
+   every panel: 1060 x 440, title (or art) on the top edge, buttons on the bottom edge.
+   every item inside: a 170px art box + one white outlined label at 28px. */
+.panel-in,.panel-in.how-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{
+  width:1060px !important;height:440px !important;padding:70px 20px 60px !important;box-sizing:border-box;display:flex !important;flex-direction:column;align-items:center;justify-content:center;gap:0 !important}
+.tiles,.panel-in .tiles,.panel-in.chapter-in .tiles{gap:16px !important;align-items:flex-start}
+.tiles .tile,.tiles .tile:nth-child(n),.panel-in.chapter-in .tile{width:240px !important;height:auto !important;gap:16px !important;justify-content:flex-start}
+.tile-art{flex:0 0 170px !important;height:170px;width:100%;display:flex;align-items:center;justify-content:center}
+.tile-img{max-height:150px !important;max-width:220px !important}
+.tile.hero{width:420px !important}
+.tile.hero .tile-art{flex-basis:200px !important;height:200px}
+.tile.hero .tile-img{max-height:200px !important;max-width:380px !important}
+.tile-lbl,.panel-in.chapter-in .tile-lbl{font-size:28px !important}
+.tile .big-time b{font-size:64px !important}
+.panel-in.chapter-in{padding-top:96px !important}
+.tile-img.win{animation:te-hop 1.1s cubic-bezier(.3,0,.4,1) .2s infinite}
+.caught-parrot{animation:te-shake .25s linear infinite}
+.pause-in .tile-art > *{transform:scale(1.45)}
+/* panels: one height; How to Play is wide, the rest share a narrower width */
+.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{width:860px !important}
+.panel-in.chapter-in{padding-top:70px !important}
+/* lives: feather + count, same pattern as the timer */
+.feather-ic{width:auto;height:34px;transform:rotate(-20deg)}
+.clock.lives{gap:8px;padding:8px 20px 8px 12px}
+#hud-lives{left:30px;top:0;height:0;display:flex;align-items:center;transform:translateY(68px)}
+#hud-clock{left:178px}
+.big-time .feather-ic{height:58px;filter:drop-shadow(2px 3px 0 var(--ink))}
+.pause-in .tile-art > *{transform:none}
+.feather-ic{height:40px;transform:rotate(-12deg)}.big-time .feather-ic{height:76px}
+/* timer + lives share one icon style: hand-inked sticker drawings */
+.clock-ic-img{height:40px;width:auto}
+.feather-ic{height:42px !important;transform:rotate(-8deg) !important;filter:none !important}
+.big-time .clock-ic-img{height:84px}
+.big-time .feather-ic{height:88px !important}
+.big-time{gap:12px}
+.clock.lives,.clock{padding:6px 20px 6px 10px}
+/* panels size to their content (same height for all), content centred */
+.panel-in,.panel-in.how-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{width:auto !important;min-width:640px;padding:56px 60px 56px !important}
+.panel-in.chapter-in{padding-top:56px !important}
+.tile.hero .tile-art{flex-basis:250px !important;height:250px}
+.tile.hero .tile-img{max-height:250px !important;max-width:420px !important}
+.tile-img{max-height:160px !important}
+/* HUD: style A — white pills, sticker icons */
+#hud .clock{border:4px solid var(--ink);border-radius:999px;background:#fff;box-shadow:4px 5px 0 var(--ink);padding:6px 22px 6px 12px;gap:10px}
+#hud .clock b{font-size:40px !important;color:var(--ink)}
+#hud .clock-ic-img,#hud .feather-ic{height:46px !important}
+#hud-clock{left:196px}
+/* panel labels larger */
+.tile-lbl,.panel-in.chapter-in .tile-lbl{font-size:36px !important}
+.tiles .tile,.tiles .tile:nth-child(n),.panel-in.chapter-in .tile{width:auto !important;min-width:220px;padding:0 6px}
+.tiles,.panel-in .tiles{gap:34px !important}
+.tiles,.panel-in .tiles{gap:64px !important}
+/* CTA: a slightly brighter teal so it reads as strongly as the mustard (ink text 7.8:1) */
+.te-btn.teal{background:#2bb5aa}
+.panel-in.how-in .tiles{gap:44px !important}.panel-in.how-in{padding-left:40px !important;padding-right:40px !important}
+.panel-in.chapter-in .tiles,.panel-in.pause-in .tiles{gap:64px !important}
+.panel-in.chapter-in .tiles,.panel-in.pause-in .tiles{gap:96px !important}
+.tile-img.clock-sm{max-height:118px !important}
+/* shorter panels, content sits a little above centre (the buttons cover the bottom edge) */
+.panel-in,.panel-in.how-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{height:380px !important;padding-top:44px !important;padding-bottom:78px !important}
+.tile.hero .tile-art{flex-basis:200px !important;height:200px}
+.tile.hero .tile-img{max-height:200px !important}
+.tile-img.feather-big{max-height:130px !important;transform:rotate(-10deg)}
+/* ---------- HUD unified: white pills, ink silhouettes, ink text ---------- */
+#hud .clock-ic-img,#hud .feather-ic{height:52px !important;margin:-4px 0;transform:none !important;filter:none !important}
+
+#hud-prompt .te-prompt{border:4px solid var(--ink);border-radius:999px;box-shadow:4px 5px 0 var(--ink);background:#fff;padding:8px 22px 8px 14px;height:56px;box-sizing:content-box}
+#hud-prompt .te-prompt b,#hud-prompt .te-prompt .count{font-size:32px !important;color:var(--ink) !important}
+#hud-prompt .te-prompt::before,#hud-prompt .te-prompt::after{display:none}
+#hud .clock{height:56px;box-sizing:content-box}
+/* tighter side margins on every panel */
+.panel-in,.panel-in.how-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{padding-left:34px !important;padding-right:34px !important;min-width:520px}
+.tiles .tile,.tiles .tile:nth-child(n),.panel-in.chapter-in .tile{min-width:0 !important}
+.panel-in.how-in .tiles{gap:52px !important}
+.tile-img.ic{max-height:124px !important}
+.pn-img{display:block;height:auto;max-width:none !important;max-height:none !important}
+.tile-art{flex:0 0 140px !important;height:140px !important}
+.tile.hero .tile-art{flex-basis:200px !important;height:200px !important}
+.pn-img.win{animation:te-hop 1.1s cubic-bezier(.3,0,.4,1) .2s infinite}
+/* hurry: keep the white pill; the numbers turn pink and the pill pulses */
+#hud .clock.hurry{background:#fff !important;--te-bg:#fff}
+#hud .clock.hurry b{color:var(--hot-pink) !important}
+.tile-art{flex:0 0 172px !important;height:172px !important}
+.tile.hero .tile-art{flex-basis:236px !important;height:236px !important}
+.panel-in,.panel-in.how-in,.panel-in.chapter-in,.panel-in.pause-in,.panel-in.clear-in,.panel-in.caught-in,.panel-in.soon-in{height:420px !important}
+.panel-in.how-in .tiles{gap:40px !important}
+.panel-in.how-in .tiles{gap:16px !important}.panel-in.how-in{padding-left:22px !important;padding-right:22px !important}
+/* clean vector HUD icons, one stroke weight */
+#hud .clock-ic-img,#hud .feather-ic{height:48px !important;width:48px !important;margin:-2px 0 !important;transform:none !important;filter:none !important}
+#hud .clock-ic-img,#hud .feather-ic{width:auto !important;height:50px !important}
+#hud .feather-ic{height:54px !important;transform:rotate(8deg) !important}
+#hud .feather-ic{transform:none !important;height:52px !important;margin-left:4px !important}
+#hud .clock-ic-img{height:50px !important;width:50px !important}#hud .feather-ic{height:62px !important;width:auto !important;margin:-6px -4px -6px 2px !important}
+#hud .clock-ic-img{height:58px !important;width:58px !important;margin:-6px -2px -6px 0 !important}
+#hud .clock-ic-img{height:50px !important;width:50px !important;margin:-4px -2px -4px 0 !important}#hud .feather-ic{height:52px !important;margin:-4px -2px -4px 2px !important}
+/* one HUD pill style: same outline, shadow, height, padding and text size */
+#hud .clock,#hud-prompt .te-prompt{border:4px solid var(--ink) !important;border-radius:999px !important;box-shadow:4px 5px 0 var(--ink) !important;background:#fff !important;height:56px !important;padding:6px 24px 6px 14px !important;box-sizing:content-box !important;gap:12px !important;filter:none !important}
+#hud .clock::before,#hud .clock::after,#hud-prompt .te-prompt::before,#hud-prompt .te-prompt::after{display:none !important}
+#hud .clock b,#hud-prompt .te-prompt b,#hud-prompt .te-prompt .count{font-size:36px !important;color:var(--ink) !important;line-height:1 !important}
+.title-top .te-ch,.te-lettering .te-ch{will-change:transform}
+#screen.dim{backdrop-filter:none !important;background:rgba(13,10,16,.42) !important}
+.panel-wrap,.pop-in{will-change:transform}
+/* hover: buttons grow a little (scale is separate from the wave/nudge transforms, so they combine) */
+.te-btn{transition:scale .16s cubic-bezier(.3,1.6,.5,1)}
+.te-btn:hover,.te-btn:focus-visible{scale:1.07}
+.te-btn:active{scale:.97}
+.te-btn{transition:scale .22s cubic-bezier(.25,.8,.35,1),transform .22s cubic-bezier(.25,.8,.35,1) !important;will-change:transform,scale;backface-visibility:hidden}
+.te-btn:hover{transform:rotate(var(--tilt,-2deg))}
+.te-btn:active{scale:.97;transition-duration:.08s !important}
+/* noise meter jumps on every step, bigger for louder steps */
+#hud-noise{transform-origin:top right}
+#hud-noise.kick{animation:te-kick .22s cubic-bezier(.3,1.6,.5,1)}
+@keyframes te-kick{0%{transform:scale(1)}35%{transform:scale(var(--kick,1.1))}100%{transform:scale(1)}}
+#hud-noise.danger{animation:te-danger .09s linear infinite alternate}
+@keyframes te-danger{from{translate:calc(var(--d,3px) * -1) 0}to{translate:var(--d,3px) 0}}
+/* every illustration sits on the same baseline: its bottom is a fixed gap above the white label */
+.tile{display:flex !important;flex-direction:column !important;align-items:center !important;gap:14px !important}
+.tile-art{display:flex !important;align-items:flex-end !important;justify-content:center !important;overflow:visible !important;margin:0 !important;padding:0 !important}
+.tile-lbl{margin:0 !important}
+/* illustrations are vertically centred in a shared art band; labels stay on one line */
+.tile-art{align-items:center !important}
+/* hero art (caught / clear / soon) gets a band tall enough for the whole sticker, so the label sits clear below it */
+.tile.hero .tile-art{flex-basis:270px !important;height:270px !important}
+.tiles .tile.hero,.tiles .tile.hero:nth-child(n){gap:30px !important}
+.panel-in.pause-in .tiles{gap:120px !important}
+/* rows of tiles: equal columns, so the illustrations sit at even spacing whatever their width */
+.panel-in .tiles{display:grid !important;grid-auto-flow:column;grid-auto-columns:1fr;column-gap:28px !important;justify-items:center}
+.panel-in .tiles .tile{width:auto !important;min-width:0 !important}
+.panel-in.how-in .tiles{grid-auto-columns:210px}
+.panel-in.chapter-in .tiles{grid-auto-columns:250px}
+/* How to Play: even gaps between the pictures themselves — each column is as wide as its picture, labels may overhang */
+.panel-in.how-in .tiles{display:flex !important;column-gap:0 !important;gap:72px !important;justify-content:center}
+.panel-in.how-in .tiles .tile{width:auto !important;flex:0 0 auto}
+.panel-in.how-in .tile-lbl{white-space:nowrap;width:0;display:flex;justify-content:center;overflow:visible}
+.panel-in.how-in{padding-left:60px !important;padding-right:60px !important}
+
+/* the ending: white flash, then the holiday picture */
+#screen.ending-on { background: none; }
+.ending { position: absolute; inset: 0; overflow: hidden; }
+.ending-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); transition: transform 6s cubic-bezier(.2,.7,.2,1); }
+.ending.show .ending-img { transform: scale(1); }
+.ending-white { position: absolute; inset: 0; background: #fff; opacity: 0; transition: opacity .8s ease-in; pointer-events: none; }
+.ending.white .ending-white { opacity: 1; }
+.ending.show .ending-white { opacity: 0; transition: opacity 1.2s ease-out; }
+.ending-title { position: absolute; left: 0; right: 0; top: 4%; display: flex; justify-content: center; opacity: 0; transform: translateY(-30px) scale(.8) rotate(-3deg); transition: opacity .35s, transform .5s cubic-bezier(.3,1.6,.5,1); }
+.ending-btns { position: absolute; left: 0; right: 0; bottom: 5%; display: flex; justify-content: center; gap: 28px; opacity: 0; transform: translateY(30px); transition: opacity .35s .25s, transform .45s .25s cubic-bezier(.3,1.6,.5,1); }
+.ending.title .ending-title { opacity: 1; transform: none; }
+.ending.title .ending-btns { opacity: 1; transform: none; }
+.ending-title { left: auto; right: 2%; top: 3%; flex-direction: column; align-items: center; gap: 4px; }
+.ending.top .ending-title { left: 0; right: 0; top: 6%; }
+.ending.right .ending-title { left: 44%; right: 0; top: 10%; }
+.ending.left .ending-title { left: 0; right: 46%; top: 8%; }
+.ending.top .ending-btns { left: 0; right: 0; bottom: auto; top: 34%; }
+.ending.right .ending-btns { left: 44%; right: 0; bottom: auto; top: 37%; }
+.ending.left .ending-btns { left: 0; right: 46%; bottom: auto; top: 36%; }
+.ending.right .ending-title { left: 42%; right: 0; top: 27%; }
+.ending.right .ending-btns { left: 42%; right: 0; top: 57%; }
+.ending.right .ending-title { top: 22%; gap: 0; }
+.ending.right .ending-btns { top: 60%; }
+.ending.right .ending-title { top: 24%; } .ending.right .ending-btns { top: 57%; }
+
+/* animated ending: each layer gets its own little loop */
+.ending-img { overflow: hidden; }
+.end-l { position: absolute; display: block; pointer-events: none; }
+.end-base { left: 0; top: 0; width: 100%; height: 100%; }
+.end-palm { transform-origin: 0% 100%; animation: endPalm 4.6s ease-in-out infinite; }
+.end-umbrella { transform-origin: 6% 100%; animation: endUmb 3.2s ease-in-out infinite; }
+.end-bushes { transform-origin: 50% 100%; animation: endBush 3.8s ease-in-out infinite; }
+.end-turkey { transform-origin: 55% 85%; animation: endTurkey 2.6s ease-in-out infinite; }
+.end-boat { animation: endBoat 3.4s ease-in-out infinite; }
+.end-clouds { animation: endClouds 26s ease-in-out infinite alternate; }
+.end-sea { position: absolute; left: 25%; right: 0; top: 50%; height: 30%; pointer-events: none; mix-blend-mode: screen; opacity: .55;
+  background: repeating-linear-gradient(100deg, transparent 0 46px, rgba(255,255,255,.55) 48px 52px, transparent 54px 120px);
+  -webkit-mask: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent); mask: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  animation: endSea 5s linear infinite; }
+@keyframes endPalm { 0%,100% { transform: rotate(0deg) skewX(0deg); } 50% { transform: rotate(1.6deg) skewX(-1.5deg); } }
+@keyframes endUmb { 0%,100% { transform: rotate(0deg); } 30% { transform: rotate(-1.2deg); } 60% { transform: rotate(.8deg); } }
+@keyframes endBush { 0%,100% { transform: skewX(0deg) scaleY(1); } 50% { transform: skewX(2.5deg) scaleY(1.02); } }
+@keyframes endTurkey { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-1.2%) rotate(-1.2deg); } }
+@keyframes endBoat { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(14%) rotate(2deg); } }
+@keyframes endClouds { from { transform: translateX(-1.5%); } to { transform: translateX(2.5%); } }
+@keyframes endSea { from { background-position: 0 0; } to { background-position: 240px 0; } }
+.ending.right .ending-title { left: 36%; top: 30%; }
+.ending.right .ending-btns { left: 36%; top: 62%; }
+.end-sea { left: 30%; right: 0; top: 50%; height: 16%; opacity: .35;
+  background: repeating-linear-gradient(90deg, transparent 0 60px, rgba(255,255,255,.7) 62px 74px, transparent 76px 150px); background-size: 300px 100%;
+  -webkit-mask: linear-gradient(to bottom, transparent, #000 35%, #000 65%, transparent); mask: linear-gradient(to bottom, transparent, #000 35%, #000 65%, transparent); }
+@keyframes endSea { from { background-position: 0 0; } to { background-position: 300px 0; } }
+.tile.hero .pn-img.hero-clock{transform:scale(1.7)} /* the alarm clock fills the hero band like the other big illustrations */
+/* too loud: the meter grows and rattles (scale is separate from the shake so they combine) */
+#hud-noise{transition:scale .18s cubic-bezier(.3,1.6,.5,1)}
+#hud-noise.danger{scale:var(--big,1.4);animation:te-danger .07s linear infinite alternate}
+@keyframes te-danger{from{translate:calc(var(--d,3px) * -1) calc(var(--d,3px) * .4);rotate:calc(var(--tw,2deg) * -1)}to{translate:var(--d,3px) calc(var(--d,3px) * -.4);rotate:var(--tw,2deg)}}
+/* last 10 s: same white pill with pink numbers; it grows and rings like an alarm clock on every tick */
+#hud .clock.hurry b{color:var(--hot-pink) !important} /* last 10 s: numbers turn pink again (Tina asked for the previous look) */
+#hud .clock{transform-origin:left center;transition:scale .2s cubic-bezier(.3,1.6,.5,1)}
+#hud .clock.hurry{scale:1.18;animation:none}
+#hud .clock.hurry.ring{animation:te-ring .45s ease-out}
+#hud .clock.hurry .clock-ic-img{animation:te-bell .18s linear infinite alternate}
+@keyframes te-ring{0%{rotate:0deg}15%{rotate:-6deg}30%{rotate:6deg}45%{rotate:-4deg}60%{rotate:3deg}100%{rotate:0deg}}
+@keyframes te-bell{from{rotate:-10deg}to{rotate:10deg}}
+.title-layout.side .title-stack{translate:0 44px;scale:0.86} /* original room framing; plate enlarged 15%, so the lockup sits a touch higher and smaller */
+.title-layout.side .title-top{scale:1.16;transform-origin:50% 100%} /* bigger TURKEY ESCAPE lettering; grows upward so the gap to the buttons stays */
+/* losing a life: the feather pill bumps once and the count flashes pink, then settles back to black */
+#hud .lives.hit{animation:life-bump .5s cubic-bezier(.3,1.6,.5,1)}
+#hud .lives.hit b{animation:life-pink 1.1s ease-out}
+@keyframes life-bump{0%{scale:1}35%{scale:1.22;rotate:-4deg}70%{rotate:3deg}100%{scale:1;rotate:0deg}}
+@keyframes life-pink{0%,55%{-webkit-text-fill-color:var(--hot-pink)}100%{-webkit-text-fill-color:var(--ink)}}
+.te-btn:not(.teal){background:#ffc61a} /* CTA yellow: brighter and cleaner than the old mustard #ebb316 */
+.end-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ending.right .ending-title{left:33%;right:4%;top:20%} .ending.right .ending-btns{left:33%;right:4%;top:53%} /* ending text a touch higher and further from the right edge */
+/* smoother ending: white rises over the game, the beach is hidden until the white is full, then the white melts away slowly */
+.ending .ending-img{opacity:0;transform:scale(1.05);transition:opacity 0s .1s,transform 7s cubic-bezier(.25,.6,.3,1)}
+.ending.show .ending-img{opacity:1;transform:scale(1);transition:opacity 0s,transform 7s cubic-bezier(.25,.6,.3,1)}
+.ending .ending-white{transition:opacity 1.1s cubic-bezier(.45,0,.55,1)}
+.ending.show .ending-white{opacity:0;transition:opacity 1.8s cubic-bezier(.4,0,.2,1)}
+/* one gap for every pair of buttons (title, panels, ending): 36px between the buttons as seen on screen */
+:root{--pair-gap:36px}
+.title-btns,.title-layout.side .title-btns{gap:calc(var(--pair-gap) / .86 + 2px)} /* the title lockup is drawn at 86%, so its gap is set a bit wider to look the same */
+.panel-btns,.ending-btns{gap:calc(var(--pair-gap) + 2px)}
+.ending.right .ending-btns{top:calc(53% + 21px)} /* same title-to-buttons space as the title screen */
+/* ending buttons pop one after the other (PLAY AGAIN, then MENU), like the title screen */
+.ending .ending-btns{opacity:1;transform:none;transition:none}
+.ending-btns .te-btn{opacity:0;transform:translateY(24px) scale(.85)}
+.ending.title .ending-btns .te-btn{animation:te-btn-in .5s cubic-bezier(.3,1.6,.5,1) .35s both}
+.ending.title .ending-btns .te-btn + .te-btn{animation-delay:.55s}
+.title-btns .te-btn + .te-btn{animation-delay:.95s !important} /* second title button follows the first, same rhythm as the ending */
+
+/* ============ phones & tablets (body.touch) ============ */
+html,body{overscroll-behavior:none}
+body.touch,body.touch *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+body.touch #stage{touch-action:none}
+#touch{position:absolute;inset:0;pointer-events:none}
+#hud.hidden #touch{display:none}
+.tpad{position:absolute;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;
+  background:#fff;border:5px solid var(--ink);border-radius:50%;box-shadow:5px 6px 0 var(--ink);touch-action:none;transition:transform .08s,box-shadow .08s,background .08s}
+.tpad svg{width:52%;height:52%;display:block}
+.tpad.on{transform:translate(3px,4px) scale(.94);box-shadow:2px 2px 0 var(--ink);background:#ffe38a}
+#touch .tpad.left{left:40px;bottom:36px;width:132px;height:132px}
+#touch .tpad.right{left:196px;bottom:36px;width:132px;height:132px}
+#touch .tpad.walk{right:44px;bottom:36px;width:176px;height:176px}
+.tpad.walk svg{width:40%;height:40%;margin-top:-6px}
+.tpad.walk b{font-family:var(--font-text);font-size:30px;line-height:1;color:var(--ink);margin-top:2px;letter-spacing:.02em}
+.tsmall{position:absolute;pointer-events:auto;width:76px;height:76px;border-radius:50%;border:4px solid var(--ink);background:#fff;box-shadow:4px 5px 0 var(--ink);padding:0;display:flex;align-items:center;justify-content:center}
+.tsmall svg{width:34px;height:34px}
+#touch .pause-btn{right:304px;top:22px}
+/* on touch: sound button moves up beside pause; the keyboard hint pill goes, the peck count moves to the top centre */
+body.touch.playing #mute{right:396px;top:22px;bottom:auto}
+body.touch #hud-prompt{left:0;right:0;bottom:auto;top:126px;display:flex;justify-content:center}
+body.touch #hud-prompt .te-prompt{padding:8px 24px}
+/* How to Play tiles: the on-screen buttons, small */
+.tic{display:flex;gap:14px;align-items:center;justify-content:center;height:150px}
+.tic .tpad{position:relative;box-shadow:4px 5px 0 var(--ink);border-width:4px}
+.tic.walk .tpad{width:136px;height:136px}
+.tic.walk .tpad b{font-size:24px}
+.tic.lr .tpad{width:96px;height:96px}
+/* upright phone: ask to turn it — built like the title screen */
+#rotate{display:none}
+@media (orientation:portrait){
+  body.touch #rotate{display:flex;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;overflow:hidden;
+    background:linear-gradient(rgba(20,12,60,.55),rgba(20,12,60,.55)),url("../img/title-main.webp") 50% 40%/auto 100% #2a1f6b}
+}
+#rotate .rot-box{display:flex;flex-direction:column;align-items:center;gap:56px;width:600px;flex:0 0 auto;transform-origin:center}
+.rot-words{align-items:center;gap:0}
+.rot-stage{width:420px;height:420px;display:flex;align-items:center;justify-content:center}
+.rot-device{position:relative;width:236px;height:400px;box-sizing:border-box;background:#fff;border:7px solid var(--ink);border-radius:44px;
+  box-shadow:7px 9px 0 var(--ink);display:flex;align-items:center;justify-content:center;animation:rot-turn 2.8s cubic-bezier(.6,0,.3,1) infinite}
+.rot-cam{position:absolute;top:16px;left:50%;width:46px;height:10px;margin-left:-23px;border-radius:6px;background:var(--ink)}
+.rot-turkey{width:184px;height:auto;display:block;animation:rot-keep 2.8s cubic-bezier(.6,0,.3,1) infinite}
+@keyframes rot-turn{0%,22%{transform:rotate(0)}48%,86%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+@keyframes rot-keep{0%,22%{transform:rotate(0) scale(1)}48%,86%{transform:rotate(90deg) scale(1.25)}100%{transform:rotate(0) scale(1)}} /* the turkey stays upright and gets bigger once the phone is sideways */
+/* phones: sound + pause go in the top-right corner, the noise meter sits just left of them */
+#touch .pause-btn{right:36px;top:30px}
+body.touch.playing #mute{right:128px;top:30px;bottom:auto}
+body.touch #hud-noise{right:236px}
+/* phones: the sound button stays in the same top-right spot on every screen; pause sits to its left during play */
+body.touch #mute,body.touch.playing #mute{right:36px;top:30px;bottom:auto}
+#touch .pause-btn{right:128px;top:30px}
+body.touch #hud-prompt .te-prompt{padding:6px 26px !important} /* no keycap on phones: equal space both sides */
+.rot-in{width:100%;box-sizing:border-box}
+#rotate .te-panel,#rotate .rot-box > *{margin:0 auto}
+.tpad.walk i{font-style:normal;font-family:var(--font-text);font-size:20px;line-height:1;color:var(--ink);opacity:.7;margin-top:2px}
+.tpad.walk i:empty{display:none}
+#touch.cage .tpad.left,#touch.cage .tpad.right{opacity:.35;pointer-events:none} /* no dodging inside the cage */
+.rot-stage{position:relative}
+.rot-bar{position:absolute;bottom:18px;left:50%;width:70px;height:9px;margin-left:-35px;border-radius:6px;background:var(--ink)}
+.rot-device{background:#fff}
+.rot-arw{position:absolute;right:-10px;top:-6px;width:120px;height:120px;filter:drop-shadow(5px 6px 0 #0d0a10);animation:rot-arw 2.8s cubic-bezier(.6,0,.3,1) infinite}
+@keyframes rot-arw{0%,22%{opacity:1;transform:rotate(0)}40%,86%{opacity:0;transform:rotate(-40deg)}100%{opacity:1;transform:rotate(0)}}
+.rot-arw{right:-36px;top:-40px;width:128px;height:128px;box-sizing:border-box;background:#fff;border:6px solid var(--ink);border-radius:50%;box-shadow:6px 7px 0 var(--ink);filter:none;display:flex;align-items:center;justify-content:center;animation:rot-arw2 2.8s cubic-bezier(.6,0,.3,1) infinite}
+.rot-arw svg{width:62%;height:62%}
+@keyframes rot-arw2{0%,22%{transform:rotate(0) scale(1)}12%{transform:rotate(0) scale(1.08)}48%,86%{transform:rotate(-90deg) scale(1)}100%{transform:rotate(0)}}
+/* bars around the game: a blurred, dimmed copy of the picture fills them */
+#fill{position:fixed;inset:-60px;width:calc(100% + 120px);height:calc(100% + 120px);filter:blur(40px) brightness(.55) saturate(1.1);z-index:0;pointer-events:none}
+#frame{z-index:1}
+/* full-screen button: same sticker button as sound, just left of it */
+#fs{position:absolute;right:128px;bottom:30px;width:76px;height:76px;box-sizing:border-box;border-radius:50%;border:4px solid var(--ink);background:var(--paper);color:var(--ink);
+  box-shadow:4px 5px 0 var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;padding:0}
+#fs svg{width:32px;height:32px} #fs .c{display:none} #fs.on .o{display:none} #fs.on .c{display:inline}
+body.touch #fs{display:none}
+/* one layout on every device: sound always top-right; during play pause sits left of it and the noise meter left of that */
+#mute,body.touch #mute,body.touch.playing #mute{right:36px;top:30px;bottom:auto}
+#hud .pause-btn{right:128px;top:30px}
+#hud-noise,body.touch #hud-noise{right:236px}
+#fs{display:none}
+/* small copyright line, bottom centre, on the title and the ending */
+.copy-line{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-family:var(--font-text);font-size:16px;letter-spacing:.04em;color:#fff;opacity:.75;text-shadow:0 1px 3px rgba(13,10,16,.6);pointer-events:none;z-index:4}
+.ending .copy-line{opacity:0;transition:opacity .6s .6s}
+.ending.title .copy-line{opacity:.8}
+.copy-line{font-family:"Fredoka",system-ui,sans-serif !important;font-weight:500;font-variation-settings:normal} /* one font for the whole line (the display font only has bold digits) */
+.copy-line{bottom:30px;font-size:14px;opacity:.5 !important;text-shadow:none} .ending.title .copy-line{opacity:.55 !important} /* subtle, a little higher */

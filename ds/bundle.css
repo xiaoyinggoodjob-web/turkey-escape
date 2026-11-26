@@ -1,0 +1,135 @@
+/* Turkey Escape UI kit: hand-inked stickers on violet. Values come from tokens.css. */
+.te-root{font-family:var(--font-text);color:var(--paper)}
+/* the UI face is always Fredoka at width 90, weight 550 (matched to the drawn SPACE key) */
+.te-label,.te-btn,.te-card-label,.te-prompt,.te-key{font-variation-settings:"wdth" 90}
+
+/* ---------- Lettering ---------- */
+.te-letters{display:inline-flex;flex-wrap:wrap;justify-content:center;column-gap:.26em;row-gap:.02em;
+  font-family:var(--font-display);font-weight:400;line-height:1;text-transform:uppercase;letter-spacing:.005em}
+.te-word{display:inline-flex;white-space:nowrap}
+.te-ch{position:relative;display:inline-block;color:var(--te-fill,var(--mustard));
+  -webkit-text-stroke:var(--stroke-letter,.11em) var(--ink);paint-order:stroke fill;
+  transform:translateY(var(--dy,0)) rotate(var(--rot,0deg)) scale(var(--sc,1));transform-origin:50% 80%}
+.te-ch::before{content:attr(data-c);position:absolute;left:.035em;top:.075em;z-index:-1;
+  color:var(--te-shadow,var(--hot-pink));-webkit-text-stroke:var(--stroke-letter,.11em) var(--ink);paint-order:stroke fill}
+.te-letters.is-plain .te-ch::before{display:none}
+.te-letters{isolation:isolate}
+
+/* ---------- Text labels ---------- */
+.te-label{font-family:var(--font-text);font-weight:550;text-transform:uppercase;letter-spacing:.01em;line-height:1.1}
+.te-label.on-violet{color:var(--paper);-webkit-text-stroke:.14em var(--ink);paint-order:stroke fill}
+.te-label.on-light{color:var(--ink)}
+
+/* ---------- Sticker shape (shared) ---------- */
+.te-sticker{position:relative;isolation:isolate}
+.te-sticker::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--te-bg);
+  border:var(--stroke-ink,4px) solid var(--ink);border-radius:var(--te-r,22px 26px 20px 28px / 26px 20px 28px 22px);
+  box-shadow:var(--te-shadow-box,var(--shadow-hard));filter:url(#te-rough)}
+
+/* ---------- Button ---------- */
+.te-btn{appearance:none;border:0;background:none;padding:0;cursor:pointer;position:relative;display:inline-grid;place-items:center;
+  min-width:200px;height:74px;padding:0 34px 8px 30px;
+  font-family:var(--font-text);font-weight:550;font-size:32px;line-height:1;text-transform:uppercase;color:var(--ink);
+  transform:rotate(var(--tilt,-2deg));transition:transform .12s ease}
+.te-btn.sm{min-width:150px;height:56px;font-size:24px;padding:0 26px 6px 22px}
+.te-btn > .te-btn-bg{position:absolute;inset:0;display:block}
+.te-btn > .te-btn-bg svg{width:100%;height:100%;display:block}
+.te-btn-label{position:relative}
+.te-btn:hover{transform:rotate(var(--tilt,-2deg)) translateY(-2px)}
+.te-btn:active{transform:rotate(var(--tilt,-2deg)) translate(2px,3px)}
+.te-btn:focus-visible{outline:3px dashed var(--paper);outline-offset:6px}
+
+/* ---------- Keycaps: artwork + label in the UI face ---------- */
+.te-key{position:relative;display:inline-block;vertical-align:middle}
+.te-key-label{position:absolute;left:0;right:0;top:41%;transform:translateY(-50%);text-align:center;
+  font-family:var(--font-text);font-weight:550;font-variation-settings:"wdth" 90;line-height:1;color:var(--ink);
+  font-size:calc(var(--kw,72px)*.42);letter-spacing:.01em}
+.te-key.wide .te-key-label{top:43%;font-size:calc(var(--kw,240px)*.155)}
+
+/* motion squiggles around an icon */
+.te-motion{position:relative;display:inline-block}
+.te-motion > .te-squig{position:absolute;width:36px;height:36px;overflow:visible;pointer-events:none}
+.te-squig path{fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Artwork ---------- */
+.te-art{display:inline-block;line-height:0}
+.te-art svg{width:100%;height:auto;display:block;overflow:visible}
+
+/* ---------- Control card (How to Play) ---------- */
+.te-card{position:relative;display:flex;flex-direction:column;align-items:center;
+  width:var(--card-w,300px);height:calc(var(--card-w,300px)*.887)}
+.te-card > .te-card-bg{position:absolute;inset:0}
+.te-card > .te-card-bg svg{width:100%;height:100%}
+.te-card .te-card-art{position:relative;height:66%;width:100%;display:flex;align-items:center;justify-content:center;padding-top:4%}
+.te-card .te-card-label{position:relative;flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding-bottom:6%;
+  font-family:var(--font-text);font-weight:550;font-size:calc(var(--card-w,300px)*.15);line-height:1;color:var(--ink);text-transform:uppercase}
+
+/* ---------- Panel ---------- */
+.te-panel{--te-bg:var(--violet-600);--te-r:30px 26px 34px 28px / 26px 34px 28px 30px;
+  --te-shadow-box:10px 12px 0 var(--ink);padding:64px 40px 34px}
+
+/* ---------- Noise meter ---------- */
+.te-wave{display:inline-block;overflow:visible}
+.te-wave .bar{stroke-linecap:round}
+.te-meter{display:inline-flex;align-items:center;gap:12px}
+.te-meter .te-label{font-size:16px}
+
+/* ---------- Prompt pill ---------- */
+.te-prompt{--te-bg:var(--paper);--te-r:999px;--te-shadow-box:4px 5px 0 var(--ink);
+  display:inline-flex;align-items:center;gap:10px;padding:8px 18px 9px 10px;
+  font-family:var(--font-text);font-weight:550;font-size:22px;color:var(--ink);text-transform:uppercase}
+
+.te-prompt .te-key.wide{min-width:0;padding:0 10px 3px}
+
+/* ---------- Stamp ---------- */
+.te-stamp{display:inline-block;padding:.08em .32em .02em;border:.1em solid var(--stamp-red);border-radius:.14em;
+  font-family:var(--font-display);font-size:var(--s,88px);line-height:1;color:var(--stamp-red);text-transform:uppercase;
+  transform:rotate(var(--tilt,-12deg));filter:url(#te-distress);
+  box-shadow:inset 0 0 0 .05em var(--stamp-red)}
+
+/* ---------- Lives fan ---------- */
+.te-fan{position:relative;display:inline-block;width:var(--fan,150px);height:calc(var(--fan,150px)*.72)}
+.te-fan .te-feather{position:absolute;left:50%;bottom:0;width:calc(var(--fan,150px)*.36);
+  transform-origin:12% 96%;transform:translateX(-12%) rotate(var(--rot))}
+.te-fan .te-feather.lost{opacity:.28;filter:grayscale(1) brightness(1.6)}
+
+@media (prefers-reduced-motion:reduce){.te-btn{transition:none}}
+
+/* ---------- Lettering v2 (Turkey Bubble, matched to the logo) ----------
+   thin ink outline, warm flat yellow, a sheen line hugging each letter's top-left edge,
+   pink extrusion offset by the letter-shadow-x / letter-shadow-y tokens */
+.te-letters{font-family:var(--font-display);font-kerning:none}
+.te-letters:not(.is-plain) .te-ch{--stroke-letter:var(--stroke-letter,.075em)}
+.te-letters .te-ch::before{left:var(--letter-shadow-x,.075em);top:var(--letter-shadow-y,.09em);color:var(--te-shadow,#e8317a)}
+.te-letters:not(.is-plain) .te-ch::after{content:attr(data-c);position:absolute;left:0;top:0;pointer-events:none;color:transparent;-webkit-text-stroke:0;
+  background:linear-gradient(180deg,#fbcb45 0%,#f7c036 55%,#f1b02a 100%);-webkit-background-clip:text;background-clip:text}
+.te-letters[style*="--te-fill"]:not(.is-plain) .te-ch::after{background:var(--te-fill);-webkit-background-clip:text;background-clip:text}
+.te-letters .te-ch .te-hl{position:absolute;left:0;top:0;z-index:2;pointer-events:none;color:#fff;-webkit-text-stroke:0;filter:url(#te-sheen);
+  -webkit-mask-image:linear-gradient(170deg,#000 0%,#000 30%,transparent 52%);mask-image:linear-gradient(170deg,#000 0%,#000 30%,transparent 52%)}
+.te-letters.is-plain .te-hl{display:none}
+
+/* ---------- UI text in the title face ---------- */
+.te-btn,.te-btn .te-btn-label,.te-label,.te-prompt,.te-prompt b,.te-card-label,.te-key{font-family:var(--font-text);font-weight:400;font-synthesis:none;font-variation-settings:normal}
+
+/* ---------- Button v2: colour fill, ink outline, white rim, hard ink drop ---------- */
+.te-btn > .te-btn-bg{display:none}
+.te-btn{background:var(--mustard);border:5px solid var(--ink);border-radius:16px;padding:0 34px 2px;
+  box-shadow:0 0 0 7px var(--paper),6px 9px 0 7px var(--ink);min-width:200px;height:72px}
+.te-btn.teal{background:var(--teal)}
+.te-btn .te-btn-label{font-size:36px;letter-spacing:.01em}
+.te-btn.sm{min-width:150px;height:56px;padding:0 24px 2px;box-shadow:0 0 0 5px var(--paper),5px 7px 0 5px var(--ink)}
+.te-btn.sm .te-btn-label{font-size:26px}
+
+/* ---------- Lettering 3D: a solid pink block extruded from each letter ----------
+   the block runs from the letter face to (letter-shadow-x, letter-shadow-y); its sides shade darker toward the back;
+   one ink outline wraps the whole block. depth: "flat" in the component gives the old offset-copy shadow. */
+.te-3d .te-ch::before{display:none !important}
+.te-3d .te-ex,.te-3d .te-exf{position:absolute;pointer-events:none;
+  left:calc(var(--letter-shadow-x,.075em) * var(--k));top:calc(var(--letter-shadow-y,.09em) * var(--k))}
+.te-3d .te-ex{z-index:-2;color:var(--ink);-webkit-text-stroke:var(--stroke-letter,.075em) var(--ink)}
+.te-3d .te-exf{z-index:-1;-webkit-text-stroke:0;color:color-mix(in srgb,var(--te-shadow,#ec3a82),#b0185a calc(var(--k) * 45%))}
+/* 3D: one ink outline around the whole block (face + sides); no line between the face and its sides */
+.te-3d .te-ch{-webkit-text-stroke:0 !important}
+.te-3d .te-ex{-webkit-text-stroke:calc(var(--stroke-letter,.075em) * 1.25) var(--ink) !important}
+/* richer pink 3D sides */
+.te-3d .te-exf{color:color-mix(in srgb,#ff2a8a,#d4096a calc(var(--k) * 60%)) !important}
