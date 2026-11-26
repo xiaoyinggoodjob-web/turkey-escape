@@ -156,9 +156,12 @@
   }
 
   // ------------------------------------------------------------ audio: Luma files when present, synth fallback otherwise
-  var AC = null, muted = false, music = null, SND = {};
+  var AC = null, muted = false, SND = {};
   var AUDIO = ["music", "scream", "parrotWake", "unlatch", "forks", "cereal", "tray", "spoon", "catWake", "catHiss", "squeak", "crunch", "clicky", "flump", "snore", "uncleWake", "uncleShout", "bone", "woof", "sniff", "leash", "boots", "growl"]; // the rest (peck, latch, click, tick, rooster, win, fail, chips, box, steps) are the built-in sounds in SYNTH
-  function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === "suspended") AC.resume(); return AC; }
+  function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state !== "running" && AC.state !== "closed") { try { AC.resume(); } catch (e) { } } return AC; }
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) { } // iPhone: play even when the ring/silent switch is on silent, like a video would
+  function unlock() { var a = ac(); if (!a) return; try { var b = a.createBuffer(1, 1, 22050), s = a.createBufferSource(); s.buffer = b; s.connect(a.destination); s.start(0); } catch (e) { } } // older iPhones need a sound started inside a tap
+  ["pointerdown", "touchend", "keydown"].forEach(function (ev) { document.addEventListener(ev, unlock, true); }); // every tap: phones can suspend audio again after a call or switching apps
   // Luma-made tracks not yet copied into audio/ stream from Luma until they are
   // Luma sound effects (5 s clips, sound at the start); local audio/<name>.mp3 wins when present
   var REMOTE = {}; // no outside sound links: every sound is a file here or a built-in synth
@@ -166,11 +169,12 @@
   var wantMusic = false;
   document.addEventListener("pointerdown", function () { ac(); wantMusic = true; startMusic(); }, { once: true });
   document.addEventListener("keydown", function () { ac(); wantMusic = true; startMusic(); }, { once: true });
-  function loadAudio() {
+  function loadAudio() { // every sound file is decoded once into Web Audio: exact volume, fades and overlap work the same on phones and computers
+    var a = ac(); if (!a) return;
     AUDIO.forEach(function (k) {
-      var a = new Audio(); a.preload = "auto"; a.src = "audio/" + k + ".mp3";
-      a.addEventListener("canplaythrough", function () { SND[k] = a; if (k === "music" && wantMusic) startMusic(); }, { once: true });
-      if (REMOTE[k]) a.addEventListener("error", function () { if (a.src.indexOf(REMOTE[k]) < 0) { a.src = REMOTE[k]; a.load(); } });
+      fetch("audio/" + k + ".mp3").then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); })
+        .then(function (d) { return new Promise(function (res, rej) { a.decodeAudioData(d, res, rej); }); })
+        .then(function (b) { SND[k] = b; if (k === "music" && wantMusic) startMusic(); }).catch(function () { });
     });
   }
   function tone(type, f0, f1, dur, vol, delay) {
@@ -221,22 +225,27 @@
     fail: function () { [392, 330, 262].forEach(function (f, i) { tone("triangle", f, f * 0.98, 0.3, 0.1, i * 0.18); }); }
   };
   var snoring = null;
-  function stopSnore() { if (snoring) { snoring.pause(); snoring = null; } }
+  function fadeOut(n, secs) { var a = AC; if (!n || !a) return; var t = a.currentTime; try { n.g.gain.cancelScheduledValues(t); n.g.gain.setValueAtTime(n.g.gain.value, t); n.g.gain.linearRampToValueAtTime(0, t + secs); n.s.stop(t + secs + 0.02); } catch (e) { } }
+  function stopSnore() { if (snoring) { fadeOut(snoring, 0.15); snoring = null; } }
   function sfx(k, vol, rate) {
     if (window.__sfxlog) window.__sfxlog.push([performance.now(), k, vol == null ? 1 : vol, rate || 1, muted]); // trailer recorder only
     if (muted) return; vol = vol == null ? 1 : vol;
-    if (SND[k]) { var a = SND[k].cloneNode(); a.volume = Math.min(1, 0.8 * vol); if (k === "snore") snoring = a; if (rate) { a.preservesPitch = false; a.playbackRate = rate; } a.play().catch(function () { });
-      if (CUT[k]) setTimeout(function () { var f = setInterval(function () { a.volume = Math.max(0, a.volume - 0.15); if (a.volume <= 0) { a.pause(); clearInterval(f); } }, 30); }, CUT[k] * 1000);
+    var a = AC;
+    if (SND[k] && a) { var g = a.createGain(), s = a.createBufferSource(), v = Math.min(1, 0.8 * vol); s.buffer = SND[k]; if (rate) s.playbackRate.value = rate;
+      g.gain.value = v; s.connect(g); g.connect(a.destination); s.start(); var n = { s: s, g: g }; if (k === "snore") snoring = n;
+      if (CUT[k]) { var t = a.currentTime + CUT[k]; g.gain.setValueAtTime(v, t); g.gain.linearRampToValueAtTime(0, t + v / 0.15 * 0.03); s.stop(t + v / 0.15 * 0.03 + 0.02); } // same short fade-out at the cut as before
       return; }
     if (SYNTH[k]) SYNTH[k](vol);
   }
+  // background music: one looping track with its own volume, paused and resumed where it left off
+  var music = null, musicAt = 0, musicT0 = 0;
   function startMusic() {
-    if (muted || !SND.music) return;
-    if (!music) { music = SND.music; music.loop = true; } music.volume = 0.3;
-    wantMusic = true;
-    music.play().catch(function () { });
+    wantMusic = true; var a = ac(); if (muted || !SND.music || !a || music) return;
+    var g = a.createGain(), s = a.createBufferSource(); s.buffer = SND.music; s.loop = true; g.gain.value = 0.3; s.connect(g); g.connect(a.destination);
+    var off = musicAt % SND.music.duration; s.start(0, off); musicT0 = a.currentTime - off; music = { s: s, g: g };
   }
-  function stopMusic() { if (music) music.pause(); }
+  function stopMusic() { if (!music) return; musicAt = AC.currentTime - musicT0; fadeOut(music, 0.05); music = null; }
+  function musicSoft() { if (!music) return; var t = AC.currentTime; music.g.gain.cancelScheduledValues(t); music.g.gain.setValueAtTime(music.g.gain.value, t); music.g.gain.linearRampToValueAtTime(0.1, t + 1.2); } // quieter under the beach waves
   var beach = { buf: null, src: null, gain: null, want: false };
   function beachBuf() { // decode once; trim the encoder's silent padding so the loop point lands on real sound
     if (beach.buf || beach.loading || !ac()) return; beach.loading = true;
@@ -924,7 +933,7 @@
   }
   function showEnding() { // the very end: fade to full white, then the turkey on holiday toasting the camera
     S.mode = "ending"; stopSnore(); setHUD(false);
-    if (!muted) startMusic(); if (music) { var mv = setInterval(function () { music.volume = Math.max(0.1, music.volume - 0.01); if (music.volume <= 0.1) clearInterval(mv); }, 60); } // the music keeps going, softly, under the waves
+    if (!muted) startMusic(); musicSoft(); // the music keeps going, softly, under the waves
     var wrap = el("div", "ending white " + (SCENE4.endLayout || "")), flash = el("div", "ending-white"), title = el("div", "ending-title");
     var pic = el("div", "ending-img"); // the beach: Tina's Luma loop (waves, a light breeze), seamless, with its own soft ocean sound
     var vid = document.createElement("video"); vid.className = "end-video"; vid.src = "img/ending.mp4"; vid.poster = "img/ending-poster.webp";
