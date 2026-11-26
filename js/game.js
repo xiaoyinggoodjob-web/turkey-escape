@@ -148,35 +148,11 @@
 
   // ------------------------------------------------------------ audio: Luma files when present, synth fallback otherwise
   var AC = null, muted = false, music = null, SND = {};
-  var AUDIO = ["music", "latchDrop", "uiClick", "tick", "rooster", "win", "fail", "scream", "parrotWake", "unlatch", "peck", "step", "forks", "chips", "cereal", "tray", "spoon", "box", "catWake", "catHiss", "squeak", "crunch", "clicky", "flump", "snore", "uncleWake", "uncleShout", "bone", "woof", "sniff", "leash", "boots", "growl"];
+  var AUDIO = ["music", "scream", "parrotWake", "unlatch", "forks", "cereal", "tray", "spoon", "catWake", "catHiss", "squeak", "crunch", "clicky", "flump", "snore", "uncleWake", "uncleShout", "bone", "woof", "sniff", "leash", "boots", "growl"]; // the rest (peck, latch, click, tick, rooster, win, fail, chips, box, steps) are the built-in sounds in SYNTH
   function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === "suspended") AC.resume(); return AC; }
   // Luma-made tracks not yet copied into audio/ stream from Luma until they are
   // Luma sound effects (5 s clips, sound at the start); local audio/<name>.mp3 wins when present
-  var REMOTE = {
-    latchDrop: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycISzdlRzRqYjKDNCsP2hwrgioVyzjIxmdH",
-    uiClick: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIR2VrZ1NVVW2O9PZjz31VKJU_2eXTqKXp",
-    tray: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIdHNrZFZRWWrw_Yw0Jhg1W3XBlhJ-l2cV",
-    chips: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIdEF3akhERkiBrceQXKJeiiZ-ry0rY2GW",
-    cereal: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIcm9GckN0eGYIt40Z6RorpHzFTJxvarug",
-    forks: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIc1dqaDlaY27KYVEb5dKkX-yYvN4zLZt4",
-    spoon: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIRzhGMnRxZVC56V2rk6q5m3Ko3ABpnwFf",
-    box: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIdDk0VXFfWnj32XTNryffgHKF2-V8jnXV",
-    peck: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIc0dlbXAxX0fbT-xzA3M9wH6oZNH6oGdx",
-    unlatch: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIT080RzJqeU2StAoWTqyoxCzZWycSOyzU",
-    parrotWake: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycISlFScDBkSkYrblf7uaYQHBkz65cmn9qD",
-    scream: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIQTVQYnNnTk-f59xqNWNGXF8j1GEFxYjl",
-    tick: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycISG5GYUswUkL2esSPjIV9DIW8WoW9aMIU",
-    rooster: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIdFFveU1NTnEZ0HDNJTlDDo_k5ecbI4kX",
-    win: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIcUtBOVdfUlkbN4Ud_Zz4SOBkw37fjhua",
-    snore: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIbUdLYnd4N1cBdbTDk97NJGjJ-nkpAoqg",
-    uncleWake: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIemx2aWRtNWn4d4UI6Kt4_lBpqA_9Ifu3",
-    uncleShout: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIcjFKbDZNVG7nmYUtnGGlX_mKqMnHZcwm",
-    squeak: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIUHZwMERFb3d6jMEPBhPTRKmeD8-c0lLN",
-    crunch: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycITFEyYy1SUkGqZz5YBZhWmwmCOx1AWslF",
-    clicky: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIUW45V2NPOWf21UvTSnokXoTbOAaKLoYj",
-    flump: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIVjdkTlV0c3rUaRijNEt04VIuQC2M8uwK",
-    fail: "https://agents.lumalabs.ai/mcp/media/AQEBngZABkcTTpmpEEXlkK3Ng3tuinqLN0zNr0xNT2s5bycIV3VJa0FSMzB1ul9l3OkrhQ1C94K1QxRs"
-  };
+  var REMOTE = {}; // no outside sound links: every sound is a file here or a built-in synth
   var CUT = { latchDrop: 1.6, uiClick: .35, tray: 1.3, chips: .8, cereal: 1, forks: 1.1, spoon: .7, box: .7, peck: .3, unlatch: 1.6, parrotWake: 1.4, scream: 1.8, tick: .3, rooster: 2.6, win: 3, fail: 2.6, squeak: 0.5, crunch: 1.4, clicky: 0.7, flump: 0.6, snore: 2, uncleWake: 1.7, uncleShout: 0.6, bone: 1, woof: 0.9, sniff: 1.5, leash: 1.05, boots: 0.6, growl: 1.3 };
   var wantMusic = false;
   document.addEventListener("pointerdown", function () { ac(); wantMusic = true; startMusic(); }, { once: true });
