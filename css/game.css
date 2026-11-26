@@ -815,3 +815,4 @@ body.touch #fs{display:none}
 .ending.title .copy-line{opacity:.8}
 .copy-line{font-family:"Fredoka",system-ui,sans-serif !important;font-weight:500;font-variation-settings:normal} /* one font for the whole line (the display font only has bold digits) */
 .copy-line{bottom:30px;font-size:14px;opacity:.5 !important;text-shadow:none} .ending.title .copy-line{opacity:.55 !important} /* subtle, a little higher */
+#hud.hidden{visibility:hidden}

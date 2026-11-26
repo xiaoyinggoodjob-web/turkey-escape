@@ -769,7 +769,7 @@
     return i;
   }
   function tile(art, label, size) { return el("div", "tile " + (size || ""), [el("div", "tile-art", [art]), label ? el("div", "tile-lbl", [label]) : null]); }
-  function livesPill(n, cls) { return el("div", cls || "clock te-sticker lives", [img("img/hud3-feather.webp", "feather-ic"), el("b", null, [n + "/" + T.wakes])]); }
+  function livesPill(n, cls) { return el("div", cls || "clock te-sticker lives", [img("img/hud3-feather.webp", "feather-ic"), el("b", null, [Math.max(0, n) + "/" + T.wakes])]); }
   function star3d(on, size, delay) { // drawn like the title lettering: rounded star, yellow face + sheen, pink 3D sides, one ink outline around it all
     var P = "M50 14 L60.5 37 L85.5 39.5 L66.5 56.5 L72 81 L50 68.5 L28 81 L33.5 56.5 L14.5 39.5 L39.5 37 Z", d = 10;
     var side = on ? "#ff2a8a" : "#211560", face = on ? "url(#sg)" : "#3a2a8e", ink = "", fill = "";
