@@ -49,7 +49,7 @@
     vp: { x: 661, y: 400 },
     D: 14, E: 262, F: 330,
     door: { x0: 588, x1: 735, y0: 208, y1: 396 },            // the arch to the hallway (background image coordinates)
-    cat: { x: 637, y: 277, w: 150 },                           // curled up on the seat of the head chair, in front of the arch
+    cat: { x: 637, y: 277, w: 158 },                           // curled up on the seat of the head chair, in front of the arch
     seatFront: { x0: 546, x1: 729, y0: 274, y1: 306 },        // the seat top, for the cat's contact shadow
     laneX: 1.0, lanes: 2,
     clutter: [],                                              // no mess here: just the robot vacuums
@@ -126,10 +126,19 @@
     });
   }
   function bake(im) { // vector art is rasterised once; drawing a complex SVG every frame is slow
-    if (!im || !/\.svg/.test(im.src)) return im;
+    if (!im) return im;
+    if (!/\.svg/.test(im.src)) { var c0 = document.createElement("canvas"); c0.width = im.width; c0.height = im.height; c0.getContext("2d").drawImage(im, 0, 0); c0.src = im.src; return im.width > 200 ? mips(c0) : im; }
     var sc = TOUCH ? Math.max(1, Math.min(1.25, 2000 / im.width)) : Math.max(1, Math.min(2, 3200 / im.width)), c = document.createElement("canvas"); // 2x so the camera can zoom in without blur
     c.width = Math.round(im.width * sc); c.height = Math.round(im.height * sc);
-    c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); c.src = im.src; return c;
+    c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); c.src = im.src; mips(c); return c;
+  }
+  function mips(c) { // smaller copies, each half the size, made with smooth downscaling: far-away things are drawn from the
+    var lv = [c], cur = c;  // nearest copy, so thin outlines stay clean instead of shimmering or breaking up
+    while (cur.width > 96 && cur.height > 96 && lv.length < 6) {
+      var n = document.createElement("canvas"); n.width = Math.max(1, Math.round(cur.width / 2)); n.height = Math.max(1, Math.round(cur.height / 2));
+      var x = n.getContext("2d"); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high"; x.drawImage(cur, 0, 0, n.width, n.height); lv.push(n); cur = n;
+    }
+    c.mips = lv; return c;
   }
   function loadImages() {
     var core = Promise.all(Object.keys(SRC).map(function (k) { return loadOne(SRC[k]).then(function (im) { if (im) IMG[k] = bake(im); }); }));
@@ -263,6 +272,17 @@
   }
 
   var view = document.getElementById("view"), g = view.getContext("2d");
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+  (function () { var raw = g.drawImage.bind(g); // pick the mip level that is just bigger than the size it is drawn at on screen
+    g.drawImage = function (im, a, b, w, h) {
+      if (im && im.mips && arguments.length === 5) {
+        var t = g.getTransform(), sx = Math.hypot(t.a, t.b) * Math.abs(w) / im.width, sy = Math.hypot(t.c, t.d) * Math.abs(h) / im.height, k = Math.max(sx, sy), L = 0;
+        while (L < im.mips.length - 1 && k <= 0.5 / Math.pow(2, L)) L++;
+        return raw(im.mips[L], a, b, w, h);
+      }
+      return raw.apply(null, arguments);
+    };
+  })();
   var $ = function (id) { return document.getElementById(id); };
 
   // ------------------------------------------------------------ camera
@@ -306,25 +326,25 @@
 
   // ------------------------------------------------------------ render
   // title scene depth: the sides sit slightly out of focus; wherever the light points comes sharp
-  var blurTitle = null, focusMask = null, focusCv = null, plateMask = null;
+  var blurTitle = null, focusMask = null, focusCv = null, plateMask = null, TQ = 1.5;
   function drawFocus() {
     if (!blurTitle) {
-      blurTitle = document.createElement("canvas"); blurTitle.width = W; blurTitle.height = H;
-      var bg = blurTitle.getContext("2d"); bg.drawImage(IMG.title, 0, 0, W, H); bg.filter = "blur(2.5px)"; bg.drawImage(IMG.title, 0, 0, W, H); // same geometry, so nothing shifts as focus moves
+      blurTitle = document.createElement("canvas"); blurTitle.width = W * TQ; blurTitle.height = H * TQ;
+      var bg = blurTitle.getContext("2d"); bg.scale(TQ, TQ); bg.drawImage(IMG.title, 0, 0, W, H); bg.filter = "blur(2.5px)"; bg.drawImage(IMG.title, 0, 0, W, H); // same geometry, so nothing shifts as focus moves
       focusMask = document.createElement("canvas"); focusMask.width = 2000; focusMask.height = 1200;
       var mg = focusMask.getContext("2d"), gr = mg.createLinearGradient(200, 0, 1800, 0); // a wide, very soft band: sharp in the middle, fading out over a long distance
       gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(0.3, "rgba(255,255,255,.55)"); gr.addColorStop(0.5, "#fff"); gr.addColorStop(0.7, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(255,255,255,0)");
       mg.fillStyle = gr; mg.beginPath(); mg.moveTo(1000 - 450, 0); mg.lineTo(1000 + 450, 0); mg.lineTo(1000 + 900, 1200); mg.lineTo(1000 - 900, 1200); mg.closePath(); mg.fill();
-      focusCv = document.createElement("canvas"); focusCv.width = W; focusCv.height = H;
-      plateMask = document.createElement("canvas"); plateMask.width = W; plateMask.height = H; // the platter is always in focus
-      var pm = plateMask.getContext("2d"); pm.filter = "blur(30px)"; pm.fillStyle = "#fff";
+      focusCv = document.createElement("canvas"); focusCv.width = W * TQ; focusCv.height = H * TQ; focusCv.getContext("2d").scale(TQ, TQ);
+      plateMask = document.createElement("canvas"); plateMask.width = W * TQ; plateMask.height = H * TQ; // the platter is always in focus
+      var pm = plateMask.getContext("2d"); pm.scale(TQ, TQ); pm.filter = "blur(30px)"; pm.fillStyle = "#fff";
       pm.beginPath(); pm.ellipse(640, 558, 525, 150, 0, 0, 7); pm.fill();
     }
     var sp = SPOT, ang = Math.atan2(sp.x - 640, Math.max(200, sp.y + 140)) * 0.9, fc = focusCv.getContext("2d");
     fc.globalCompositeOperation = "source-over"; fc.clearRect(0, 0, W, H);
-    fc.save(); fc.translate(640, -160); fc.rotate(-ang); fc.drawImage(focusMask, -1000, -40); fc.restore(); fc.drawImage(plateMask, 0, 0);
+    fc.save(); fc.translate(640, -160); fc.rotate(-ang); fc.drawImage(focusMask, -1000, -40); fc.restore(); fc.drawImage(plateMask, 0, 0, W, H);
     fc.globalCompositeOperation = "source-in"; fc.drawImage(IMG.title, 0, 0, W, H);
-    g.drawImage(blurTitle, 0, 0); g.drawImage(focusCv, 0, 0);
+    g.drawImage(blurTitle, 0, 0, W, H); g.drawImage(focusCv, 0, 0, W, H);
   }
   var coneCache = null, SPOT = { x: 640, y: 560, tx: 640, ty: 560, at: 0 };
   (function () {
@@ -1148,7 +1168,10 @@
   window.addEventListener("blur", pause);
   $("mute").addEventListener("click", function () { ac(); toggleMute(); });
 
+  var RES = 1; // the canvas is drawn at the real screen resolution (window size x retina), not stretched up from 1280x720
   function fit() { var vw = window.innerWidth, vh = window.innerHeight, s = Math.min(vw / W, vh / H); $("stage").style.transform = "scale(" + s + ")";
+    var k = Math.max(1, Math.min(TOUCH ? 2 : 2.5, s * (window.devicePixelRatio || 1))); k = Math.round(k * 4) / 4;
+    if (k !== RES) { RES = k; view.width = Math.round(W * k); view.height = Math.round(H * k); view.style.width = W + "px"; view.style.height = H + "px"; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high"; }
     var rb = document.querySelector("#rotate .rot-box"); if (rb && rb.offsetWidth) rb.style.transform = "scale(" + Math.min((vw - 40) / rb.offsetWidth, (vh - 160) / rb.offsetHeight) + ")";
     if (TOUCH && portrait() && S && S.mode === "play") pause(); } // turning the phone upright pauses the game
   window.addEventListener("resize", fit); window.addEventListener("orientationchange", function () { setTimeout(fit, 250); }); fit();
@@ -1160,7 +1183,7 @@
   function toggleFull() { var d = document.documentElement; try { if (document.fullscreenElement) document.exitFullscreen(); else if (d.requestFullscreen) d.requestFullscreen({ navigationUI: "hide" }); } catch (e) { } }
   document.addEventListener("fullscreenchange", function () { setTimeout(fit, 50); });
   var last = 0;
-  function frame(t) { paintFill(t); var dt = Math.min(0.05, (t - last) / 1000 || 0); last = t; if (S) S.dtLast = dt; update(dt); if (humNode) hum(); setHUD(false); render(dt); requestAnimationFrame(frame); }
+  function frame(t) { paintFill(t); g.setTransform(RES, 0, 0, RES, 0, 0); var dt = Math.min(0.05, (t - last) / 1000 || 0); last = t; if (S) S.dtLast = dt; update(dt); if (humNode) hum(); setHUD(false); render(dt); requestAnimationFrame(frame); }
   S = fresh();
   window.__te = { go: function (n) { showChapter(n); }, get S() { return S; }, T: T, get SCENE() { return SCENE; }, floorPt: function (x, z) { return floorPt(x, z); }, hd: function () { return hitDz(); }, pop: function (a, b, c, d, e) { pop(a, b, c, d, e); }, caught: function () { showCaught(); }, clear: function () { showClear(); }, pause: function () { showPause(); } };
   loadAudio();
