@@ -223,6 +223,7 @@
   var snoring = null;
   function stopSnore() { if (snoring) { snoring.pause(); snoring = null; } }
   function sfx(k, vol, rate) {
+    if (window.__sfxlog) window.__sfxlog.push([performance.now(), k, vol == null ? 1 : vol, rate || 1, muted]); // trailer recorder only
     if (muted) return; vol = vol == null ? 1 : vol;
     if (SND[k]) { var a = SND[k].cloneNode(); a.volume = Math.min(1, 0.8 * vol); if (k === "snore") snoring = a; if (rate) { a.preservesPitch = false; a.playbackRate = rate; } a.play().catch(function () { });
       if (CUT[k]) setTimeout(function () { var f = setInterval(function () { a.volume = Math.max(0, a.volume - 0.15); if (a.volume <= 0) { a.pause(); clearInterval(f); } }, 30); }, CUT[k] * 1000);
@@ -886,9 +887,9 @@
   function showHow() {
     var cw = 250;
     var cards = el("div", "row tiles", [
-      tile(TOUCH ? touchIc("walk") : pn("up"), TOUCH ? "TAP OR HOLD" : "WALK"),
-      tile(TOUCH ? touchIc("lr") : pn("lr"), "DODGE"),
-      tile(pn("wave"), "STAY QUIET"),
+      tile(TOUCH ? touchIc("walk") : el("div", "key-tile", [arrowKey(0)]), TOUCH ? "TAP OR HOLD" : "WALK"),
+      tile(TOUCH ? touchIc("lr") : el("div", "key-tile", [arrowKey(-90), arrowKey(90)]), "DODGE"),
+      tile(img("img/wave.svg", "pn-img wave-art"), "STAY QUIET"),
       tile(pn("clock"), "BE QUICK")
     ]);
     S.mode = "how";
@@ -1185,7 +1186,7 @@
   var last = 0;
   function frame(t) { paintFill(t); g.setTransform(RES, 0, 0, RES, 0, 0); var dt = Math.min(0.05, (t - last) / 1000 || 0); last = t; if (S) S.dtLast = dt; update(dt); if (humNode) hum(); setHUD(false); render(dt); requestAnimationFrame(frame); }
   S = fresh();
-  window.__te = { go: function (n) { showChapter(n); }, get S() { return S; }, T: T, get SCENE() { return SCENE; }, floorPt: function (x, z) { return floorPt(x, z); }, hd: function () { return hitDz(); }, pop: function (a, b, c, d, e) { pop(a, b, c, d, e); }, caught: function () { showCaught(); }, clear: function () { showClear(); }, pause: function () { showPause(); } };
+  window.__te = { go: function (n) { showChapter(n); }, get S() { return S; }, T: T, get SCENE() { return SCENE; }, floorPt: function (x, z) { return floorPt(x, z); }, hd: function () { return hitDz(); }, pop: function (a, b, c, d, e) { pop(a, b, c, d, e); }, caught: function () { showCaught(); }, sfx: function (k, v, r) { sfx(k, v, r); }, clear: function () { showClear(); }, pause: function () { showPause(); } };
   loadAudio();
   Promise.all([loadImages(), document.fonts ? Promise.all(["40px 'Turkey Bubble'", "40px 'Fredoka'", "600 40px 'Fredoka'", "40px 'Lilita One'"].map(function (f) { return document.fonts.load(f, "AZ09:/!?−").catch(function () { }); })) : null]).then(function () {
     var jump = parseInt(new URLSearchParams(location.search).get("ch") || (location.hash.match(/ch(\d)/) || [])[1], 10); // ?ch=3 or #ch3 opens a chapter directly (for testing)
