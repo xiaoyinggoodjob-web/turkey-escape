@@ -421,7 +421,7 @@
       var q = p.t / p.life, sc = q < 0.15 ? q / 0.15 : 1;
       g.save(); g.globalAlpha = q > 0.7 ? (1 - q) / 0.3 : 1; word(p.text, p.x, p.y - q * 40, p.size * (0.6 + 0.4 * sc), p.fill, p.rot); g.restore();
     });
-    if (S.mode === "exiting") { g.fillStyle = "rgba(102,68,224," + Math.max(0, Math.min(1, (S.exitT - 0.5) / 0.6)) + ")"; g.fillRect(0, 0, W, H); }
+    if (S.mode === "exiting") { g.fillStyle = "rgba(255,255,255," + Math.max(0, Math.min(1, (S.exitT - 0.45) / 0.7)) + ")"; g.fillRect(0, 0, W, H); }
     vignette();
   }
   // gravy footprints walking OUT of the empty plate: the escaped turkey's steps appear one by one, left-right-left,
@@ -925,7 +925,7 @@
   function showEnding() { // the very end: fade to full white, then the turkey on holiday toasting the camera
     S.mode = "ending"; stopSnore(); setHUD(false);
     if (!muted) startMusic(); if (music) { var mv = setInterval(function () { music.volume = Math.max(0.1, music.volume - 0.01); if (music.volume <= 0.1) clearInterval(mv); }, 60); } // the music keeps going, softly, under the waves
-    var wrap = el("div", "ending " + (SCENE4.endLayout || "")), flash = el("div", "ending-white"), title = el("div", "ending-title");
+    var wrap = el("div", "ending white " + (SCENE4.endLayout || "")), flash = el("div", "ending-white"), title = el("div", "ending-title");
     var pic = el("div", "ending-img"); // the beach: Tina's Luma loop (waves, a light breeze), seamless, with its own soft ocean sound
     var vid = document.createElement("video"); vid.className = "end-video"; vid.src = "img/ending.mp4"; vid.poster = "img/ending-poster.webp";
     vid.loop = true; vid.playsInline = true; vid.autoplay = true; vid.muted = true; vid.setAttribute("playsinline", ""); vid.setAttribute("muted", ""); startBeach(); // the picture loops silently; the waves are a gapless Web Audio loop
@@ -935,9 +935,9 @@
     var go = el("div", "ending-btns", [btn("PLAY AGAIN", "mustard", function () { showChapter(1); }, -2), btn("MENU", "teal", showTitle, 2)]);
     wrap.appendChild(pic); wrap.appendChild(title); wrap.appendChild(go); wrap.appendChild(copyLine()); wrap.appendChild(flash);
     screen(wrap, "ending-on", function () { showChapter(1); });
-    requestAnimationFrame(function () { wrap.classList.add("white"); });              // 1: the screen fills with white
-    setTimeout(function () { sfx("win"); wrap.classList.add("show"); }, 1300);        // 2: white slowly clears to the beach
-    setTimeout(function () { wrap.classList.add("title"); }, 2700);                   // 3: the title and buttons pop in
+    // 1: the doorway already faded the game to full white, so the ending starts on that same white (no second flash)
+    setTimeout(function () { wrap.classList.add("show"); }, 300);                     // 2: white slowly clears to the beach
+    setTimeout(function () { sfx("win"); wrap.classList.add("title"); }, 1900);       // 3: the title and buttons pop in, with the win jingle
   }
   function showClear() { stopSnore(); // floating panel, as in the Chapter Clear reference
     if (S.ch >= LAST) { showEnding(); return; }
