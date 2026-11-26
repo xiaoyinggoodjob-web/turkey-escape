@@ -826,3 +826,4 @@ body.touch #fs{display:none}
 .key-tile .arrow-ic.in-key{display:inline-flex;margin:0}
 .key-tile .arrow-ic.in-key svg{width:24px;height:24px}
 .key-tile{zoom:2.1;gap:2px;filter:drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff) drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff)}
+

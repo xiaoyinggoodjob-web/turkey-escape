@@ -453,7 +453,7 @@
     }
   }
   function vignette() {
-    g.save(); g.beginPath(); g.rect(0, 0, W, H); g.ellipse(W / 2, 330, 690, 575, 0, 0, Math.PI * 2);
+    g.save(); g.beginPath(); g.rect(0, 0, W, H); var o = S.mode === "exiting" ? Math.max(0, Math.min(1, (S.exitT - 0.45) / 0.7)) : 0; o = 1 + 0.9 * o * o * (3 - 2 * o); /* the corners open up together with the white at the doorway */ g.ellipse(W / 2, 330, 690 * o, 575 * o, 0, 0, Math.PI * 2);
     g.fillStyle = "#000"; g.fill("evenodd"); g.restore();
   }
   function drawParrot() {
